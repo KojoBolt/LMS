@@ -228,12 +228,12 @@ const Checkout = () => {
                             console.log('Cloud function result:', result);
                             setPaymentStatus({ message: '', type: null, isVerifying: false });
                             
-                            if (result.data.success) {
+                            if (result?.data?.success) {
                                 setPaymentStatus({ message: "Payment successful! Redirecting...", type: 'success', isVerifying: false });
-                                setTimeout(() => navigate('/payment/success'), 2000);
+                                setTimeout(() => navigate(`/student/courses/${courseId}`), 2000);
                             } else {
                                 setPaymentStatus({ 
-                                    message: result.data.message || "Payment verification failed. Please contact support.", 
+                                    message: result?.data?.message || "Payment verification failed. Please contact support.", 
                                     type: 'error', 
                                     isVerifying: false 
                                 });

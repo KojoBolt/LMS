@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MessageCircle, Phone, ChevronLeft, ChevronRight } from 'lucide-react';
-import { db } from '../../lib/firebaseConfig'; // Ensure this path is correct
+import { db } from '../../lib/firebaseConfig';
 import { collection, query, orderBy, onSnapshot, doc, getDoc } from 'firebase/firestore';
 
 // A helper function to format Firestore Timestamps into a readable string
@@ -163,9 +163,9 @@ const StudentEnrollments = () => {
                                 <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-white rounded-lg transition-colors" disabled>
                                     <ChevronLeft size={16} />
                                 </button>
-                                <button className="px-3 py-2 bg-red-500 text-white rounded-lg text-sm font-medium">
+                                {/* <button className="px-3 py-2 bg-red-500 text-white rounded-lg text-sm font-medium">
                                     1
-                                </button>
+                                </button> */}
                                 <button className="p-2 text-gray-400 hover:text-gray-800 hover:bg-white rounded-lg transition-colors" disabled>
                                     <ChevronRight size={16} />
                                 </button>

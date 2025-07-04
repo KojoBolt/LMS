@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { GraduationCap, BookOpen, Users, Database, DollarSign, Trash2, Pencil } from 'lucide-react';
+import { GraduationCap, BookOpen, Users, Database, DollarSign, Trash2, Pencil, ChevronLeft, ChevronRight } from 'lucide-react';
 import { auth, db } from '../../lib/firebaseConfig';
-import { doc, getDoc, collection, query, where, onSnapshot, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, onSnapshot, deleteDoc, orderBy, getDocs } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 
 const MainPage = () => {
@@ -14,7 +14,10 @@ const MainPage = () => {
   const [totalCoursesCount, setTotalCoursesCount] = useState(0);
   const [totalEarnings, setTotalEarnings] = useState(0);
   const [recentCourses, setRecentCourses] = useState([]);
-
+  const [allCourses, setAllCourses] = useState([]); 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [coursesPerPage] = useState(4); 
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,62 +61,93 @@ const MainPage = () => {
       return;
     }
 
-    const coursesCollectionRef = collection(db, 'courses');
-    let coursesQuery = coursesCollectionRef;
-    const unsubscribeCourses = onSnapshot(coursesQuery, (snapshot) => {
-      const coursesList = snapshot.docs.map(doc => ({
-        id: doc.id,
-        title: doc.data().courseTitle,
-        ...doc.data()
-      }));
-      setTotalCoursesCount(coursesList.length);
-      setRecentCourses(coursesList.sort((a, b) => (b.createdAt?.toDate() || 0) - (a.createdAt?.toDate() || 0)).slice(0, 5));
-    }, (error) => {
-      console.error("Error fetching courses: ", error);
-    });
+    
+    (async () => {
+      const coursesCollectionRef = collection(db, 'courses');
+      const coursesQuery = query(coursesCollectionRef, orderBy("createdAt", "desc"));
 
-    const enrollmentsCollectionRef = collection(db, 'enrollments');
-    const qEnrollments = query(enrollmentsCollectionRef);
-    const unsubscribeEnrollments = onSnapshot(qEnrollments, async (snapshot) => {
-      let enrolled = 0, active = 0, completed = 0;
-      snapshot.docs.forEach(doc => {
-        const data = doc.data();
-        if (data.status === 'enrolled') enrolled++;
-        else if (data.status === 'active') active++;
-        else if (data.status === 'completed') completed++;
+      const unsubscribeCourses = onSnapshot(coursesQuery, async (snapshot) => {
+        const coursesList = snapshot.docs.map(doc => ({
+          id: doc.id,
+          title: doc.data().courseTitle,
+          ...doc.data()
+        }));
+       
+        const sortedCourses = coursesList.sort((a, b) => (b.createdAt?.toDate() || 0) - (a.createdAt?.toDate() || 0));
+        setAllCourses(sortedCourses);
+        setTotalCoursesCount(sortedCourses.length);
+
+        
+        const coursesWithEnrollmentsPromises = coursesList.map(async (course) => {
+      
+          const enrollmentsQuery = query(
+            collection(db, "enrollments"),
+            where("courseId", "==", course.id)
+          );
+
+          const enrollmentsSnapshot = await getDocs(enrollmentsQuery);
+
+          const enrolledStudentsCount = enrollmentsSnapshot.size;
+
+          return {
+            ...course,
+            title: course.courseTitle, 
+            enrolledStudents: enrolledStudentsCount,
+          };
+        });
+
+        const coursesWithEnrollments = await Promise.all(coursesWithEnrollmentsPromises);
+
+        setTotalCoursesCount(coursesWithEnrollments.length);
+        setRecentCourses(coursesWithEnrollments.slice(0, 5)); 
+      }, (error) => {
+        console.error("Error fetching courses with enrollments: ", error);
       });
-      setEnrolledCoursesCount(enrolled);
-      setActiveCoursesCount(active);
-      setCompletedCoursesCount(completed);
-    }, (error) => {
-      console.error("Error fetching enrollments: ", error);
-    });
 
-    const usersCollectionRef = collection(db, 'users');
-    const qStudents = query(usersCollectionRef, where('role', '==', 'student'));
-    const unsubscribeStudents = onSnapshot(qStudents, (snapshot) => {
-      setTotalStudentsCount(snapshot.docs.length);
-    }, (error) => {
-      console.error("Error fetching students: ", error);
-    });
+      const enrollmentsCollectionRef = collection(db, 'enrollments');
+      const qEnrollments = query(enrollmentsCollectionRef);
+      const unsubscribeEnrollments = onSnapshot(qEnrollments, (snapshot) => {
+        let enrolled = 0, active = 0, completed = 0;
+        snapshot.docs.forEach(doc => {
+          const data = doc.data();
+          if (data.status === 'enrolled') enrolled++;
+          else if (data.status === 'active') active++;
+          else if (data.status === 'completed') completed++;
+        });
+        setEnrolledCoursesCount(enrolled);
+        setActiveCoursesCount(active);
+        setCompletedCoursesCount(completed);
+      }, (error) => {
+        console.error("Error fetching enrollments: ", error);
+      });
 
-    const earningsDocRef = doc(db, 'dashboard_summary', 'overall_earnings');
-    const unsubscribeEarnings = onSnapshot(earningsDocRef, (docSnap) => {
-      if (docSnap.exists()) {
-        setTotalEarnings(docSnap.data().total || 0);
-      } else {
-        setTotalEarnings(0);
-      }
-    }, (error) => {
-      console.error("Error fetching earnings: ", error);
-    });
+      const usersCollectionRef = collection(db, 'users');
+      const qStudents = query(usersCollectionRef, where('role', '==', 'student'));
+      const unsubscribeStudents = onSnapshot(qStudents, (snapshot) => {
+        setTotalStudentsCount(snapshot.docs.length);
+      }, (error) => {
+        console.error("Error fetching students: ", error);
+      });
 
-    return () => {
-      unsubscribeCourses();
-      unsubscribeEnrollments();
-      unsubscribeStudents();
-      unsubscribeEarnings();
-    };
+      const earningsDocRef = doc(db, 'dashboard_summary', 'overall_earnings');
+      const unsubscribeEarnings = onSnapshot(earningsDocRef, (docSnap) => {
+        if (docSnap.exists()) {
+          setTotalEarnings(docSnap.data().total || 0);
+        } else {
+          setTotalEarnings(0);
+        }
+      }, (error) => {
+        console.error("Error fetching earnings: ", error);
+      });
+
+    
+      return () => {
+        unsubscribeCourses();
+        unsubscribeEnrollments();
+        unsubscribeStudents();
+        unsubscribeEarnings();
+      };
+    })();
   }, [adminUser, loadingUser]);
 
   const handleDeleteCourse = async (courseId, courseTitle) => {
@@ -123,15 +157,32 @@ const MainPage = () => {
         console.log(`Course ${courseId} deleted successfully.`);
       } catch (error) {
         console.error("Error deleting course:", error);
-        alert("Failed to delete course. Please try again.");
       }
     }
+  };
+
+  useEffect(() => {
+    if (allCourses.length > 0) {
+        const indexOfLastCourse = currentPage * coursesPerPage;
+        const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
+        setRecentCourses(allCourses.slice(indexOfFirstCourse, indexOfLastCourse));
+    }
+  }, [currentPage, allCourses, coursesPerPage]);
+  const handleNextPage = () => {
+    setCurrentPage(prev => prev + 1);
+  };
+
+  const handlePrevPage = () => {
+    setCurrentPage(prev => prev - 1);
   };
 
   const handleEditCourse = (courseId) => {
     navigate(`/admin/edit-course/${courseId}`);
   };
 
+  const handlePageClick = (pageNumber) => {
+  setCurrentPage(pageNumber);
+};
   
   if (loadingUser || !adminUser || adminUser.role !== 'admin') {
     return (
@@ -140,6 +191,8 @@ const MainPage = () => {
       </div>
     );
   }
+  
+  const totalPages = Math.ceil(totalCoursesCount / coursesPerPage); 
 
   return (
     <div className="min-h-screen ">
@@ -294,6 +347,43 @@ const MainPage = () => {
             ) : (
               <div className="text-center py-8 text-gray-500">No recent courses found.</div>
             )}
+          </div>
+          <div className="bg-gray-50 px-6 py-4 border-t border-t-gray-300">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">
+                Page {currentPage} of {totalPages}
+              </span>
+              <div className="flex items-center space-x-2">
+                <button 
+                  onClick={handlePrevPage} 
+                  disabled={currentPage === 1}
+                  className="p-2 text-gray-600 hover:bg-white rounded-lg transition-colors disabled:text-gray-300 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                {/* Render page numbers dynamically */}
+                {Array.from({ length: totalPages }, (_, idx) => (
+                  <button
+                    key={idx + 1}
+                    onClick={() => handlePageClick(idx + 1)}
+                    className={`px-3 py-2 rounded-lg text-sm font-medium ${
+                      currentPage === idx + 1
+                        ? "bg-red-500 text-white"
+                        : "bg-white text-gray-700 hover:bg-gray-100"
+                    }`}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
+                <button 
+                  onClick={handleNextPage} 
+                  disabled={currentPage === totalPages}
+                  className="p-2 text-gray-600 hover:bg-white rounded-lg transition-colors disabled:text-gray-300 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

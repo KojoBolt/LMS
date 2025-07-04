@@ -1,92 +1,101 @@
-import { https, config } from "firebase-functions";
-import admin from "firebase-admin";
+import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { initializeApp } from "firebase-admin/app";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { defineString } from "firebase-functions/params";
 import axios from "axios";
 
-admin.initializeApp();
-const db = admin.firestore();
+// Initialize Firebase Admin SDK
+initializeApp();
+const db = getFirestore();
 
-export const verifyPaystackPayment = https.onCall(async (data, context) => {
-  if (!context.auth) {
-    console.error("Authentication failed: User not logged in");
-    throw new https.HttpsError("unauthenticated", "You must be logged in.");
+// Define the Paystack secret key as a parameter
+const paystackSecretKey = defineString("PAYSTACK_SECRET");
+
+export const verifyPaystackPayment = onCall(async (request) => {
+  // 1. Check for authentication
+  if (!request.auth) {
+    console.error("Authentication failed: User not logged in.");
+    throw new HttpsError("unauthenticated", "You must be logged in.");
   }
 
-  const { reference, courseId } = data;
-  const { uid: userId } = context.auth;
+  const { reference, courseId } = request.data;
+  const userId = request.auth.uid;
 
-  console.log("Input data:", { reference, courseId, userId });
+  console.log("Verifying payment for:", { reference, courseId, userId });
 
-  const paystackSecretKey = config().paystack.secret;
-  if (!paystackSecretKey) {
-    console.error("Configuration error: Paystack secret key missing");
-    throw new https.HttpsError("internal", "Server configuration error.");
+  if (!reference || !courseId) {
+    throw new HttpsError("invalid-argument", "Required parameters are missing.");
   }
 
   try {
-    console.log("Sending Paystack verification request...");
-    const response = await axios.get(`https://api.paystack.co/transaction/verify/${reference}`, {
-      headers: { Authorization: `Bearer ${paystackSecretKey}` },
-    });
+    // 2. Verify the transaction with Paystack
+    const response = await axios.get(
+      `https://api.paystack.co/transaction/verify/${reference}`,
+      {
+        headers: { Authorization: `Bearer ${paystackSecretKey.value()}` },
+      }
+    );
 
-    console.log("Paystack API response:", JSON.stringify(response.data, null, 2));
     const transactionData = response.data.data;
-
     if (transactionData.status !== "success") {
-      console.error("Payment verification failed:", transactionData.status);
-      throw new https.HttpsError("internal", `Payment was not successful: ${transactionData.status}`);
+      throw new HttpsError("internal", "Payment was not successful with Paystack.");
     }
 
-    console.log("Fetching course document...");
+    // 3. Verify the amount paid
     const courseRef = db.collection("courses").doc(courseId);
     const courseSnap = await courseRef.get();
     if (!courseSnap.exists) {
-      console.error("Course not found:", courseId);
-      throw new https.HttpsError("not-found", "Course not found.");
+      throw new HttpsError("not-found", "Course not found.");
     }
 
+    // --- THIS IS THE FIX ---
+    // The logic now correctly checks for a discount price, matching the frontend.
     const coursePrice = parseFloat(courseSnap.data().coursePrice) || 0;
-    const amountInDollars = transactionData.amount / 100;
+    const discountPrice = parseFloat(courseSnap.data().discountPrice) || 0;
+    const expectedAmount = (discountPrice > 0 ? discountPrice : coursePrice);
+    const amountPaid = transactionData.amount / 100; // Amount from Paystack is in kobo/pesewas
 
-    console.log("Payment validation:", { amountInDollars, coursePrice });
-    if (amountInDollars < coursePrice) {
-      console.error("Amount validation failed:", { amountInDollars, coursePrice });
-      throw new https.HttpsError("internal", "Paid amount is less than course price.");
+    // Use a small tolerance for floating point comparisons
+    if (Math.abs(amountPaid - expectedAmount) > 0.01) {
+      console.error("Amount validation failed:", { amountPaid, expectedAmount });
+      throw new HttpsError("internal", "Paid amount does not match course price.");
     }
+    // --- END OF FIX ---
 
-    console.log("Creating enrollment document...");
-    const enrollmentRef = await db.collection("enrollments").add({
+    // 4. Create enrollment and update earnings in a batch for safety
+    const batch = db.batch();
+
+    const enrollmentRef = db.collection("enrollments").doc();
+    batch.set(enrollmentRef, {
       userId: userId,
       courseId: courseId,
-      amountPaid: amountInDollars,
+      amountPaid: amountPaid,
       currency: transactionData.currency,
       paymentReference: reference,
       status: "enrolled",
-      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      createdAt: FieldValue.serverTimestamp(),
     });
-    console.log("Enrollment document created with ID:", enrollmentRef.id);
 
-    console.log("Updating dashboard_summary...");
     const earningsRef = db.collection("dashboard_summary").doc("overall_earnings");
-    await earningsRef.set({
-      total: admin.firestore.FieldValue.increment(amountInDollars),
+    batch.set(earningsRef, {
+        total: FieldValue.increment(amountPaid)
     }, { merge: true });
-    console.log("Dashboard summary updated");
 
-    console.log("Updating user enrolledCourses...");
     const userRef = db.collection("users").doc(userId);
-    await userRef.set({
-      enrolledCourses: admin.firestore.FieldValue.arrayUnion(courseId),
+    batch.set(userRef, {
+        enrolledCourses: FieldValue.arrayUnion(courseId),
     }, { merge: true });
-    console.log("User enrolledCourses updated");
 
-    console.log("Function completed successfully");
-    return { success: true, enrollmentId: enrollmentRef.id };
+    await batch.commit();
+    console.log("Database updated successfully for user:", userId);
+
+    return { success: true, message: "Enrollment successful!" };
+
   } catch (error) {
-    console.error("Error in verifyPaystackPayment:", {
-      message: error.message,
-      stack: error.stack,
-      code: error.code,
-    });
-    throw new https.HttpsError("internal", `Error: ${error.message}`);
+    console.error("Error in verifyPaystackPayment:", error);
+    if (error instanceof HttpsError) {
+        throw error;
+    }
+    throw new HttpsError("internal", "An unexpected error occurred during verification.");
   }
 });
