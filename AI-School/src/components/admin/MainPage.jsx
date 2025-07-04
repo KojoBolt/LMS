@@ -361,7 +361,7 @@ const MainPage = () => {
                 >
                   <ChevronLeft size={16} />
                 </button>
-                {/* Render page numbers dynamically */}
+                
                 {Array.from({ length: totalPages }, (_, idx) => (
                   <button
                     key={idx + 1}

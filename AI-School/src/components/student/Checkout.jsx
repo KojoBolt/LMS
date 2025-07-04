@@ -241,7 +241,7 @@ const Checkout = () => {
                         } catch (err) {
                             console.error("Error calling cloud function:", err);
                             
-                            // More specific error handling
+                            // More  error handling
                             let errorMessage = "An error occurred during payment verification.";
                             if (err.code === 'functions/unauthenticated') {
                                 errorMessage = "Authentication error. Please refresh the page and try again.";
