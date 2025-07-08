@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Bookmark } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../lib/firebaseConfig'; // Adjust path to your firebaseConfig file
+import { useNavigate } from 'react-router-dom'; // Changed from Link to useNavigate
+import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { db, auth } from '../../lib/firebaseConfig'; 
+import { onAuthStateChanged } from 'firebase/auth';
 
 const CourseList = () => {
   const [courses, setCourses] = useState([]);
@@ -11,8 +12,36 @@ const CourseList = () => {
   const scrollRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(0);
   const coursesPerPage = 4;
+  
+  // --- NEW: State to hold the current user and their enrolled courses ---
+  const [user, setUser] = useState(null);
+  const [userEnrolledCourseIds, setUserEnrolledCourseIds] = useState([]);
+  const navigate = useNavigate();
 
-  // Fetch courses from Firestore
+  // --- NEW: Effect to get the current user's authentication state ---
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe(); // Cleanup on unmount
+  }, []);
+
+  // --- NEW: Effect to fetch the user's enrolled courses once they are logged in ---
+  useEffect(() => {
+    if (user) {
+      const userDocRef = doc(db, 'users', user.uid);
+      getDoc(userDocRef).then(docSnap => {
+        if (docSnap.exists()) {
+          setUserEnrolledCourseIds(docSnap.data().enrolledCourses || []);
+        }
+      });
+    } else {
+      // If user logs out, clear their enrolled courses
+      setUserEnrolledCourseIds([]);
+    }
+  }, [user]);
+
+  // Fetch all courses from Firestore
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -31,6 +60,17 @@ const CourseList = () => {
 
     fetchCourses();
   }, []);
+  
+  // --- NEW: Handler to decide where to navigate ---
+  const handleCourseClick = (courseId) => {
+    // If the user's enrolled list includes this course ID, go to the course player
+    if (userEnrolledCourseIds.includes(courseId)) {
+      navigate(`/student/courses/${courseId}`);
+    } else {
+      // Otherwise, go to the checkout page
+      navigate(`/student/course/${courseId}`);
+    }
+  };
 
   const scroll = (direction) => {
     if (direction === 'left' && currentPage > 0) {
@@ -62,14 +102,14 @@ const CourseList = () => {
 
       <div className="relative">
         <button
-          className="absolute top-1/2 -left-4 transform -translate-y-1/2 z-10 bg-white border border-gray-300 p-2 rounded-full"
+          className="absolute top-1/2 -left-4 transform -translate-y-1/2 z-10 bg-purple-300 border border-gray-300 p-2 rounded-full"
           onClick={() => scroll('left')}
           disabled={currentPage === 0}
         >
           <ChevronLeft />
         </button>
         <button
-          className="absolute top-1/2 -right-4 transform -translate-y-1/2 z-10 bg-white border border-gray-300 p-2 rounded-full"
+          className="absolute top-1/2 -right-4 transform -translate-y-1/2 z-10 bg-purple-300 border border-gray-300 p-2 rounded-full"
           onClick={() => scroll('right')}
           disabled={(currentPage + 1) * coursesPerPage >= courses.length}
         >
@@ -78,10 +118,11 @@ const CourseList = () => {
 
         <div ref={scrollRef} className="flex flex-wrap gap-6 pb-4 pr-6">
           {getCurrentCourses().map((course) => (
-            <Link
-              to={`/student/courses/${course.id}`} // Use course.id instead of slugify(course.courseTitle)
+            // --- CHANGED: Replaced <Link> with a <div> and an onClick handler ---
+            <div
               key={course.id}
-              className="w-full sm:w-[48%] md:w-[31%] lg:w-[23%] bg-white rounded-xl shadow transition-transform duration-200 hover:scale-[1.01] overflow-hidden"
+              onClick={() => handleCourseClick(course.id)}
+              className="w-full sm:w-[48%] md:w-[31%] lg:w-[23%] bg-gray-50 rounded-xl transition-transform duration-200 hover:scale-[1.01] overflow-hidden border border-gray-200 hover:border-gray-300 cursor-pointer"
             >
               <div className="relative h-[180px] rounded-t-xl overflow-hidden">
                 <img
@@ -109,14 +150,18 @@ const CourseList = () => {
                 >
                   {course.courseLevel}
                 </span>
-                <p className="text-sm text-gray-600 mb-2">{course.shortDescription}</p>
+                <p className="text-sm text-gray-600 mb-2">
+                  {course.shortDescription && course.shortDescription.split(' ').length > 25
+                    ? course.shortDescription.split(' ').slice(0, 18).join(' ') + '...'
+                    : course.shortDescription}
+              </p>
                 <div className="flex flex-wrap gap-1 text-xs text-gray-500">
-                  {course.tags.map((tag, i) => (
-                    <span key={i}>{tag}</span>
+                  {course.tags && course.tags.map((tag, i) => (
+                    <span className="bg-green-200 text-gray-800 rounded-full px-2 py-1" key={i}>{tag}</span>
                   ))}
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </div>

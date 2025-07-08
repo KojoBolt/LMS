@@ -2,10 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Star, Clock, BookOpen, Users, Check, ChevronDown, ChevronRight, PlayCircle } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../lib/firebaseConfig'; // Adjust this path if needed
-import SlateViewer from './SlateViewer'; // Make sure this path is correct
+import { db } from '../../lib/firebaseConfig';
+import SlateViewer from './SlateViewer'; 
+import {Link} from 'react-router-dom';  
 
-// ADD THIS NEW HELPER FUNCTION
 const formatDuration = (totalMinutes) => {
     if (!totalMinutes || totalMinutes <= 0) {
         return '0m';
@@ -23,12 +23,12 @@ const formatDuration = (totalMinutes) => {
     return durationString.trim();
 };
 
-// --- Accordion Item Component ---
+// --- Accordion  Component ---
 
 const CourseStructureItem = ({ section, isExpanded, onToggle }) => {
     const lectureCount = section.lessons ? section.lessons.length : 0;
     
-    // This now calculates the real duration for the section
+   
     const sectionDuration = section.lessons 
         ? section.lessons.reduce((acc, lesson) => acc + (lesson.duration || 0), 0)
         : 0;
@@ -45,14 +45,14 @@ const CourseStructureItem = ({ section, isExpanded, onToggle }) => {
                     </span>
                     <span className="text-gray-800 font-medium">{section.title || 'Untitled Section'}</span>
                 </div>
-                {/* This now uses the new calculation and format function */}
+
                 <span className="text-gray-500 text-sm">{lectureCount} lectures - {formatDuration(sectionDuration)}</span>
             </button>
             {isExpanded && (
                 <div className="pl-12 pr-4 pb-4">
                     <ul className="space-y-2 text-sm text-gray-600">
                         {section.lessons && section.lessons.map((lesson) => (
-                            // This now shows each lesson's individual duration
+        
                             <li key={lesson.id} className="flex items-center justify-between">
                                 <div className="flex items-center">
                                     <BookOpen size={14} className="mr-2 text-gray-500"/>
@@ -90,7 +90,7 @@ const PriceCard = ({ course }) => {
             videoId = url.split('youtu.be/')[1].split('?')[0];
             return `https://www.youtube.com/embed/${videoId}?autoplay=1`;
         }
-        return url; // For direct video links
+        return url; 
     };
 
     const totalLessons = course.sections ? course.sections.reduce((acc, section) => acc + (section.lessons ? section.lessons.length : 0), 0) : 0;
@@ -154,7 +154,7 @@ const PriceCard = ({ course }) => {
                 <div className="flex items-center text-sm text-gray-600 mb-4 space-x-4 py-4">
                     <div className="flex items-center">
                         <Star className="w-4 h-4 text-yellow-400 mr-1" />
-                        <span>4.5</span> {/* Static rating for now */}
+                        <span>4.5</span>
                     </div>
                     <div className="flex items-center">
                         <Clock className="w-4 h-4 mr-1" />
@@ -165,10 +165,12 @@ const PriceCard = ({ course }) => {
                         <span>{totalLessons} lessons</span>
                     </div>
                 </div>
-                
-                <button className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-colors mb-6">
-                    Enroll Now
-                </button>
+                <div className='p-5 m-auto'>
+                <Link to={`/student/checkout/${course.id}`} className="w-full bg-blue-600 text-white py-4 px-[100px] rounded-lg font-medium hover:bg-blue-700 transition-colors mb-6 m-auto">
+                Enroll Now
+                </Link>                
+
+                </div>
                 
                 <div>
                     <h4 className="font-semibold text-gray-800 mb-3">What's in the course?</h4>

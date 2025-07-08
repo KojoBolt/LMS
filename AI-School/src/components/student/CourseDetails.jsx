@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, GraduationCap } from 'lucide-react';
-// Import Firebase services from the CDN
+// NEW: Import CheckCircle for UI feedback
+import { ChevronLeft, ChevronRight, GraduationCap, CheckCircle } from 'lucide-react';
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getFirestore, collection, getDocs, query, where, limit } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, query, where, limit, doc, getDoc, setDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { getAuth, signInAnonymously, signInWithCustomToken } from 'firebase/auth';
 import { useParams } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
 import SlateViewer from './SlateViewer'; 
 
-// --- Firebase Configuration ---
-// These variables are provided by the environment.
-// Fallback: Try to get config from window if not defined as global variable
+// Firebase config and initial tokens remain the same...
 const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config)
     ? (typeof __firebase_config === 'string' ? JSON.parse(__firebase_config) : __firebase_config)
     : (window && window.__firebase_config ? window.__firebase_config : {});
@@ -19,80 +16,52 @@ const initialAuthToken = typeof __initial_auth_token !== 'undefined'
     : null;
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
+
 const CourseDetails = () => {
     const { courseId } = useParams();
-    // State for Firebase services and data
     const [db, setDb] = useState(null);
+    const [auth, setAuth] = useState(null); // NEW: State for auth instance
     const [course, setCourse] = useState(null);
-
-    // Re-run when courseId changes: reset course and navigation state
-    useEffect(() => {
-      setCourse(null);
-      setCurrentSectionIndex(0);
-      setCurrentLessonIndex(0);
-    }, [courseId]);
-
-    // Fetch a single, specific course by courseId
-    useEffect(() => {
-      if (!db || !courseId) return;
-
-      const fetchCourseById = async () => {
-      setLoading(true);
-      try {
-        const courseRef = doc(db, 'courses', courseId);
-        const courseSnap = await getDoc(courseRef);
-
-        if (!courseSnap.exists()) {
-        setError('Course not found.');
-        setCourse(null);
-        } else {
-        setCourse({ id: courseSnap.id, ...courseSnap.data() });
-        }
-      } catch (err) {
-        console.error("Error fetching course by ID:", err);
-        setError('Failed to load the course. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-      };
-
-      fetchCourseById();
-    }, [db, courseId]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-
-    // State for navigation within the course
     const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
     const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
 
-    // Effect for Initializing Firebase
+    // NEW: State to track IDs of completed lessons. A Set is used for efficient add/check operations.
+    const [completedLessons, setCompletedLessons] = useState(new Set());
+
+    useEffect(() => {
+        // Reset state when courseId changes
+        setCourse(null);
+        setCurrentSectionIndex(0);
+        setCurrentLessonIndex(0);
+        setCompletedLessons(new Set()); // Reset progress
+    }, [courseId]);
+
+    
     useEffect(() => {
         const initializeFirebase = async () => {
             try {
-                // Check if a Firebase app is already initialized. If not, initialize one.
                 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-                const auth = getAuth(app);
                 const firestore = getFirestore(app);
+                const authInstance = getAuth(app);
 
-                // Sign in the user if not already signed in
-                if (!auth.currentUser) {
+                if (!authInstance.currentUser) {
                     if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
+                        await signInWithCustomToken(authInstance, initialAuthToken);
                     } else {
-                        // Anonymous sign-in is not enabled or allowed; skip or handle gracefully
-                        setError("Anonymous authentication is not enabled. Please contact the administrator.");
+                        // Handle anonymous sign-in or error as before
+                        setError("Authentication is required.");
                         setLoading(false);
                         return;
                     }
                 }
                 
-                // Set the firestore instance in state
                 setDb(firestore);
-                console.log("Current lesson data:", getCurrentLesson());
+                setAuth(authInstance); // Save auth instance
             } catch (err) {
                 console.error("Firebase Initialization Error:", err);
-                // Set a more generic error for the user, but log the specific one.
-                setError("Could not connect to the database. Please check the configuration.");
+                setError("Could not connect to the database.");
                 setLoading(false);
             }
         };
@@ -100,8 +69,115 @@ const CourseDetails = () => {
         initializeFirebase();
     }, []);
 
+    // NEW: useEffect to fetch user progress after Firebase and course are ready
+    useEffect(() => {
+        if (!db || !auth || !auth.currentUser || !course) return;
 
-    // --- Navigation and Helper Functions ---
+        const fetchProgress = async () => {
+            const userId = auth.currentUser.uid;
+            const progressRef = doc(db, 'userProgress', `${userId}_${course.id}`);
+            const progressSnap = await getDoc(progressRef);
+
+            if (progressSnap.exists()) {
+                const progressData = progressSnap.data();
+                // Load completed lessons into the Set
+                setCompletedLessons(new Set(progressData.completed || []));
+            }
+        };
+
+        fetchProgress();
+    }, [db, auth, course]);
+
+
+    useEffect(() => {
+        if (!db || !courseId) return;
+
+        const fetchCourseById = async () => {
+        setLoading(true);
+        try {
+            const courseRef = doc(db, 'courses', courseId);
+            const courseSnap = await getDoc(courseRef);
+
+            if (!courseSnap.exists()) {
+            setError('Course not found.');
+            setCourse(null);
+            } else {
+            // Ensure lessons have unique IDs, which are crucial for progress tracking
+            const courseData = courseSnap.data();
+            courseData.sections.forEach(section => {
+                section.lessons.forEach((lesson, index) => {
+                    if (!lesson.id) lesson.id = `${section.id}-${index}`;
+                });
+            });
+            setCourse({ id: courseSnap.id, ...courseData });
+            }
+        } catch (err) {
+            console.error("Error fetching course by ID:", err);
+            setError('Failed to load the course.');
+        } finally {
+            setLoading(false);
+        }
+        };
+
+        fetchCourseById();
+    }, [db, courseId]);
+
+    const getCurrentLesson = () => {
+        if (!course || !course.sections || course.sections.length === 0) return null;
+        const section = course.sections[currentSectionIndex];
+        if (!section || !section.lessons || section.lessons.length === 0) return null;
+        return section.lessons[currentLessonIndex];
+    };
+    
+    const currentLesson = getCurrentLesson();
+
+    // NEW: Function to mark a lesson as complete or incomplete
+    const handleToggleComplete = async () => {
+        if (!auth.currentUser || !currentLesson) return;
+
+        const userId = auth.currentUser.uid;
+        const lessonId = currentLesson.id;
+        const progressRef = doc(db, 'userProgress', `${userId}_${course.id}`);
+        
+        const isCompleted = completedLessons.has(lessonId);
+
+        try {
+            if (isCompleted) {
+                // Mark as incomplete
+                await setDoc(progressRef, { completed: arrayRemove(lessonId) }, { merge: true });
+                const newCompleted = new Set(completedLessons);
+                newCompleted.delete(lessonId);
+                setCompletedLessons(newCompleted);
+            } else {
+                // Mark as complete
+                await setDoc(progressRef, { completed: arrayUnion(lessonId) }, { merge: true });
+                const newCompleted = new Set(completedLessons);
+                newCompleted.add(lessonId);
+                setCompletedLessons(newCompleted);
+            }
+        } catch (error) {
+            console.error("Failed to update progress:", error);
+            setError("Couldn't save your progress. Please try again.");
+        }
+    };
+    
+    // MODIFIED: goToNextLesson now automatically marks the current lesson as complete
+    const goToNextLesson = async () => {
+        if (!course || !currentLesson) return;
+
+        // Automatically mark the current lesson as complete if it's not already
+        if (!completedLessons.has(currentLesson.id)) {
+            await handleToggleComplete();
+        }
+        
+        const currentSection = course.sections[currentSectionIndex];
+        if (currentLessonIndex < currentSection.lessons.length - 1) {
+            setCurrentLessonIndex(currentLessonIndex + 1);
+        } else if (currentSectionIndex < course.sections.length - 1) {
+            setCurrentSectionIndex(currentSectionIndex + 1);
+            setCurrentLessonIndex(0);
+        }
+    };
 
     const goToPreviousLesson = () => {
         if (!course) return;
@@ -110,47 +186,21 @@ const CourseDetails = () => {
         } else if (currentSectionIndex > 0) {
             const newSectionIndex = currentSectionIndex - 1;
             setCurrentSectionIndex(newSectionIndex);
-            // Go to the last lesson of the previous section
             setCurrentLessonIndex(course.sections[newSectionIndex].lessons.length - 1);
         }
     };
 
-    const goToNextLesson = () => {
-        if (!course) return;
-        const currentSection = course.sections[currentSectionIndex];
-        if (currentLessonIndex < currentSection.lessons.length - 1) {
-            setCurrentLessonIndex(currentLessonIndex + 1);
-        } else if (currentSectionIndex < course.sections.length - 1) {
-            // Move to the first lesson of the next section
-            setCurrentSectionIndex(currentSectionIndex + 1);
-            setCurrentLessonIndex(0);
-        }
-    };
-    
-    const getCurrentLesson = () => {
-        if (!course || !course.sections || course.sections.length === 0) return null;
-        const section = course.sections[currentSectionIndex];
-        if (!section || !section.lessons || section.lessons.length === 0) return null;
-        return section.lessons[currentLessonIndex];
-    };
-
+    // ... getEmbedUrl function remains the same ...
     const getEmbedUrl = (url) => {
         if (!url) return null;
         if (url.includes('youtube.com/watch?v=')) {
             return url.replace('watch?v=', 'embed/');
         }
         if (url.includes('youtu.be/')) {
-            return url.replace('youtu.be/', 'www.youtube.com/embed/');
+            return url.replace('youtu.be/', 'youtube.com/embed/');
         }
-        return url; // Assume it's already an embeddable or direct URL
+        return url; 
     };
-
-    // --- Render Logic ---
-    
-    const currentLesson = getCurrentLesson();
-
-    console.log("Checking Lesson:", currentLesson?.title, "Video URL:", currentLesson?.videoUrl);
-
 
     if (loading) {
         return <div className="flex justify-center items-center min-h-screen ml-[300px]"><p>Loading course...</p></div>;
@@ -164,11 +214,12 @@ const CourseDetails = () => {
         return <div className="flex justify-center items-center min-h-screen ml-[300px]"><p>No course available.</p></div>;
     }
     
+    // DYNAMIC PROGRESS: These calculations are now based on state
     const totalLessons = course.sections.reduce((acc, section) => acc + (section.lessons ? section.lessons.length : 0), 0);
-    const completedLessons = 0; // You can implement completion tracking later
-    const progressPercentage = totalLessons > 0 ? (completedLessons / totalLessons) * 100 : 0;
+    const progressPercentage = totalLessons > 0 ? (completedLessons.size / totalLessons) * 100 : 0;
     const isFirstLesson = currentSectionIndex === 0 && currentLessonIndex === 0;
     const isLastLesson = course.sections.length > 0 && currentSectionIndex === course.sections.length - 1 && currentLessonIndex === course.sections[course.sections.length - 1].lessons.length - 1;
+    const isCurrentLessonCompleted = currentLesson && completedLessons.has(currentLesson.id);
 
     return (
         <div className="min-h-screen bg-gray-50 ml-[300px]">
@@ -180,21 +231,22 @@ const CourseDetails = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2">
                         <div className="bg-black rounded-lg aspect-video mb-6 flex items-center justify-center overflow-hidden">
-    {currentLesson && currentLesson.videoUrl ? (
-        <iframe
-            key={currentLesson.id || currentLessonIndex} 
-            src={getEmbedUrl(currentLesson.videoUrl)}
-            className="w-full h-full"
-            allow="autoplay; encrypted-media; picture-in-picture"
-            allowFullScreen
-            title={currentLesson.title || "Course Video"}
-        ></iframe>
-    ) : (
-        <div className="text-white text-xl flex items-center justify-center h-full">
-            No Video Available for This Lesson
-        </div>
-    )}
-</div>
+                            {/* Video player remains the same */}
+                             {currentLesson && currentLesson.videoUrl ? (
+                                <iframe
+                                    key={currentLesson.id} 
+                                    src={getEmbedUrl(currentLesson.videoUrl)}
+                                    className="w-full h-full"
+                                    allow="autoplay; encrypted-media; picture-in-picture"
+                                    allowFullScreen
+                                    title={currentLesson.title || "Course Video"}
+                                ></iframe>
+                            ) : (
+                                <div className="text-white text-xl flex items-center justify-center h-full">
+                                    No Video Available
+                                </div>
+                            )}
+                        </div>
 
                         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm">
                             <div className="flex items-center gap-3 mb-4">
@@ -204,30 +256,46 @@ const CourseDetails = () => {
                                 </h2>
                             </div>
                             
-                    <div className="text-gray-700 text-lg leading-relaxed mb-6 prose max-w-none">
-                            {currentLesson?.content ? (
-                                <SlateViewer
-                                    key={currentLesson.id} // The key is vital for navigation
-                                    value={currentLesson.content}
-                                />
-                            ) : (
-                                <p>{course.shortDescription}</p> // A fallback for lessons with no content
-                            )}
-                        </div>
+                            <div className="text-gray-700 text-lg leading-relaxed mb-6 prose max-w-none">
+                                {/* SlateViewer remains the same */}
+                                {currentLesson?.content ? (
+                                    <SlateViewer
+                                        key={currentLesson.id} 
+                                        value={currentLesson.content}
+                                    />
+                                ) : (
+                                    <p>{course.shortDescription}</p> 
+                                )}
+                            </div>
 
-                            <div className="flex justify-between">
+                            {/* MODIFIED: Navigation buttons now include a Mark as Complete button */}
+                            <div className="flex justify-between items-center">
                                 <button
                                     onClick={goToPreviousLesson}
                                     disabled={isFirstLesson}
                                     className="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <ChevronLeft className="w-4 h-4" />
-                                    Previous Lesson
+                                    Previous
                                 </button>
                                 
+                                {currentLesson && (
+                                     <button
+                                        onClick={handleToggleComplete}
+                                        className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors ${
+                                            isCurrentLessonCompleted 
+                                            ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                                            : 'bg-blue-500 text-white hover:bg-blue-600'
+                                        }`}
+                                    >
+                                        <CheckCircle className="w-5 h-5" />
+                                        {isCurrentLessonCompleted ? 'Mark as Incomplete' : 'Mark as Complete'}
+                                    </button>
+                                )}
+
                                 <button
                                     onClick={goToNextLesson}
-                                     disabled={isLastLesson}
+                                    disabled={isLastLesson}
                                     className="flex items-center gap-2 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     Next Lesson
@@ -238,9 +306,10 @@ const CourseDetails = () => {
                     </div>
 
                     <div className="lg:col-span-1">
+                        {/* DYNAMIC: Progress bar UI now uses dynamic values */}
                         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm">
                             <div className="flex justify-between items-center mb-3">
-                                <h3 className="text-lg font-semibold text-gray-900">Course progress</h3>
+                                <h3 className="text-lg font-semibold text-gray-900">Course Progress</h3>
                                 <span className="text-sm text-gray-500">{Math.round(progressPercentage)}% Complete</span>
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2">
@@ -249,36 +318,45 @@ const CourseDetails = () => {
                         </div>
 
                         <div className="bg-white rounded-lg p-6 shadow-sm">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Course content</h3>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Course Content</h3>
                             
                             <div className="space-y-4">
                                 {course.sections && course.sections.map((section, secIndex) => (
                                     <div key={section.id || secIndex}>
                                         <h4 className="font-bold text-gray-800 mb-2">{section.title}</h4>
                                         <div className="space-y-2">
-                                            {section.lessons && section.lessons.map((lesson, lesIndex) => (
-                                                <div
-                                                    key={lesson.id || lesIndex}
-                                                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                                                        secIndex === currentSectionIndex && lesIndex === currentLessonIndex
-                                                            ? 'bg-blue-50 border border-blue-200'
-                                                            : 'hover:bg-gray-50'
-                                                    }`}
-                                                    onClick={() => {
-                                                        setCurrentSectionIndex(secIndex);
-                                                        setCurrentLessonIndex(lesIndex);
-                                                    }}
-                                                >
-                                                    <div className="text-sm font-medium bg-gray-100 text-gray-600 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">
-                                                        {lesIndex + 1}
+                                            {section.lessons && section.lessons.map((lesson, lesIndex) => {
+                                                // DYNAMIC: Check if the lesson is completed
+                                                const isCompleted = completedLessons.has(lesson.id);
+                                                return (
+                                                    <div
+                                                        key={lesson.id}
+                                                        className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                                                            secIndex === currentSectionIndex && lesIndex === currentLessonIndex
+                                                                ? 'bg-blue-50 border border-blue-200'
+                                                                : 'hover:bg-gray-50'
+                                                        }`}
+                                                        onClick={() => {
+                                                            setCurrentSectionIndex(secIndex);
+                                                            setCurrentLessonIndex(lesIndex);
+                                                        }}
+                                                    >
+                                                        {/* NEW: Display a checkmark icon for completed lessons */}
+                                                        {isCompleted ? (
+                                                            <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                                                        ) : (
+                                                            <div className="text-sm font-medium bg-gray-100 text-gray-600 rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
+                                                                {lesIndex + 1}
+                                                            </div>
+                                                        )}
+                                                        <span className={`flex-1 text-sm ${
+                                                            secIndex === currentSectionIndex && lesIndex === currentLessonIndex ? 'font-medium text-blue-900' : 'text-gray-700'
+                                                        } ${isCompleted ? 'text-gray-500' : ''}`}>
+                                                            {lesson.title}
+                                                        </span>
                                                     </div>
-                                                    <span className={`flex-1 text-sm ${
-                                                        secIndex === currentSectionIndex && lesIndex === currentLessonIndex ? 'font-medium text-blue-900' : 'text-gray-700'
-                                                    }`}>
-                                                        {lesson.title}
-                                                    </span>
-                                                </div>
-                                            ))}
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 ))}

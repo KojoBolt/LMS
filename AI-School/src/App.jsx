@@ -107,20 +107,22 @@ import Signup from './components/auth/Signup'
 import ForgotPassword from './components/auth/ForgotPassword'
 
 // Student Components
-import StudentDashboard from './components/student/Dashboard'
-import CourseList from './components/student/CourseList'
-import CourseDetails from './components/student/CourseDetails'
-import EnrolledCourses from './components/student/EnrolledCourses'
-import VideoPlayer from './components/student/VideoPlayer'
-import Loading from './components/student/Loading'
-import Guides from './components/student/pages/Guides'
-import Courses from './components/student/pages/Courses'
-import Workshops from './components/student/pages/Workshops'
-import Events from './components/student/pages/Events'
+import StudentDashboard from './components/student/Dashboard';
+import CourseList from './components/student/CourseList';
+import CourseDetails from './components/student/CourseDetails';
+import EnrolledCourses from './components/student/EnrolledCourses';
+import VideoPlayer from './components/student/VideoPlayer';
+import Loading from './components/student/Loading';
+import Guides from './components/student/pages/Guides';
+import Courses from './components/student/pages/Courses';
+import Workshops from './components/student/pages/Workshops';
+import Events from './components/student/pages/Events';
 import CourseDescriptionPage from './components/student/CourseDescriptionPage';
-import Checkout from './components/student/Checkout'
+import Checkout from './components/student/Checkout';
 import PaymentSuccess from './components/student/PaymentSuccess'
-import PaystackTest from './components/student/PaystackTest'
+import PaystackTest from './components/student/PaystackTest';
+import Profile from './components/student/Profile';
+import Progress from './components/student/Progress';
 
 // Admin Components
 import AdminDashboard from './components/admin/AdminDashboard'
@@ -171,6 +173,8 @@ const App = () => {
           <Route path="checkout/:courseId" element={<Checkout />} />
           <Route path="payment/success" element={<PaymentSuccess />} />
           <Route path="test/payment" element={<PaystackTest />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="progress" element={<Progress />} />
 
       
         </Route>
