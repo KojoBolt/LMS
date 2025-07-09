@@ -1,52 +1,60 @@
-// src/components/SlateEditor.js
-
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useRef } from 'react'; // Import useRef
 import isHotkey from 'is-hotkey';
 import { createEditor, Transforms, Editor, Text, Element as SlateElement, Range } from 'slate';
-import { Slate, Editable, withReact, useSlate, ReactEditor } from 'slate-react';
+import { Slate, Editable, withReact, useSlate, ReactEditor, useSelected, useFocused } from 'slate-react';
 import { withHistory } from 'slate-history';
 import {
-  Bold, Italic, Underline, Code, Heading1, Heading2,
-  List, ListOrdered, Quote
+    Bold, Italic, Underline, Code, Heading1, Heading2,
+    List, ListOrdered, Quote, Image as ImageIcon
 } from 'lucide-react';
 
 const HOTKEYS = {
-  'mod+b': 'bold',
-  'mod+i': 'italic',
-  'mod+u': 'underline',
-  'mod+`': 'code',
+    'mod+b': 'bold',
+    'mod+i': 'italic',
+    'mod+u': 'underline',
+    'mod+`': 'code',
 };
 
 const LIST_TYPES = ['numbered-list', 'bulleted-list'];
 
-// --- Reusable Toolbar Button ---
-const ToolbarButton = ({ format, icon, type = 'mark' | 'block' }) => {
-    const editor = useSlate();
-    const isActive = type === 'mark'
-        ? CustomEditor.isMarkActive(editor, format)
-        : CustomEditor.isBlockActive(editor, format);
-    
-    return (
-        <button
-            type="button"
-            className={`p-2 rounded ${isActive ? 'bg-gray-300' : 'hover:bg-gray-200'}`}
-            onMouseDown={event => {
-                event.preventDefault();
-                if (type === 'mark') {
-                    CustomEditor.toggleMark(editor, format);
-                } else {
-                    CustomEditor.toggleBlock(editor, format);
-                }
-            }}
-        >
-            {icon}
-        </button>
-    );
-};
+// --- withImages Plugin ---
+const withImages = editor => {
+    const { insertData, isVoid } = editor;
 
+    editor.isVoid = element => {
+        return element.type === 'image' ? true : isVoid(element);
+    };
+
+    editor.insertData = data => {
+        const text = data.getData('text/plain');
+        const { files } = data;
+
+        if (files && files.length > 0) {
+            for (const file of files) {
+                const reader = new FileReader();
+                const [mime] = file.type.split('/');
+
+                if (mime === 'image') {
+                    reader.addEventListener('load', () => {
+                        const url = reader.result;
+                        CustomEditor.insertImage(editor, url);
+                    });
+                    reader.readAsDataURL(file);
+                }
+            }
+        } else if (text && isImageUrl(text)) {
+            CustomEditor.insertImage(editor, text);
+        } else {
+            insertData(data);
+        }
+    };
+
+    return editor;
+};
 
 // --- Helper Functions ---
 const CustomEditor = {
+    // ... no changes to isMarkActive, isBlockActive, toggleMark, toggleBlock ...
     isMarkActive(editor, format) {
         const marks = Editor.marks(editor);
         return marks ? marks[format] === true : false;
@@ -68,39 +76,29 @@ const CustomEditor = {
             Editor.addMark(editor, format, true);
         }
     },
-    // This is the UPGRADED function that handles splitting blocks
     toggleBlock(editor, format) {
         const isActive = CustomEditor.isBlockActive(editor, format);
         const isList = LIST_TYPES.includes(format);
-        const { selection } = editor;
-
-        // First, unwrap any list to handle toggling lists off correctly
         Transforms.unwrapNodes(editor, {
             match: n => !Editor.isEditor(n) && SlateElement.isElement(n) && LIST_TYPES.includes(n.type),
             split: true,
         });
-
-        // The new, "smarter" logic
-        if (selection && !Range.isCollapsed(selection) && !isList) {
-            // Case 1: Text is highlighted. Wrap just the selection in a new block.
-            const newBlock = { type: isActive ? 'paragraph' : format, children: [] };
-            // Editor.fragment gets the highlighted part.
-            newBlock.children = Editor.fragment(editor, selection);
-            // Replaces the selection with our new block.
-            Transforms.insertNodes(editor, newBlock);
-        } else {
-            // Case 2: It's just a cursor. Change the entire block's type.
-            const newProperties = {
-                type: isActive ? 'paragraph' : isList ? 'list-item' : format,
-            };
-            Transforms.setNodes(editor, newProperties);
-        }
-
-        // If a list format was chosen, wrap the new list-item(s) in the proper list container
+        const newProperties = {
+            type: isActive ? 'paragraph' : isList ? 'list-item' : format,
+        };
+        Transforms.setNodes(editor, newProperties);
         if (!isActive && isList) {
             const block = { type: format, children: [] };
             Transforms.wrapNodes(editor, block);
         }
+    },
+    insertImage(editor, url) {
+        const text = { text: '' };
+        const image = { type: 'image', url, children: [text] };
+        const newParagraph = { type: 'paragraph', children: [{ text: '' }]};
+        
+        Transforms.insertNodes(editor, image);
+        Transforms.insertNodes(editor, newParagraph, { at: [editor.children.length] });
     },
 };
 
@@ -113,8 +111,26 @@ const Element = ({ attributes, children, element }) => {
         case 'heading-two': return <h2 {...attributes} className="text-2xl font-semibold">{children}</h2>;
         case 'list-item': return <li {...attributes}>{children}</li>;
         case 'numbered-list': return <ol {...attributes} className="list-decimal ml-8">{children}</ol>;
+        case 'image': return <Image attributes={attributes} children={children} element={element} />;
         default: return <p {...attributes}>{children}</p>;
     }
+};
+
+const Image = ({ attributes, children, element }) => {
+    const selected = useSelected();
+    const focused = useFocused();
+    return (
+        <div {...attributes}>
+            <div contentEditable={false}>
+                <img
+                    src={element.url}
+                    alt=""
+                    className={`block max-w-full max-h-80 ${selected && focused ? 'shadow-lg' : ''}`}
+                />
+            </div>
+            {children}
+        </div>
+    );
 };
 
 const Leaf = ({ attributes, children, leaf }) => {
@@ -127,10 +143,10 @@ const Leaf = ({ attributes, children, leaf }) => {
 
 // --- Main Editor Component ---
 const SlateEditor = ({ value, onChange, placeholder }) => {
-    const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+    const editor = useMemo(() => withHistory(withImages(withReact(createEditor()))), []);
     const renderElement = useCallback(props => <Element {...props} />, []);
     const renderLeaf = useCallback(props => <Leaf {...props} />, []);
-    
+
     const initialValue = useMemo(() => value && value.length > 0
         ? value
         : [{ type: 'paragraph', children: [{ text: '' }] }],
@@ -140,6 +156,7 @@ const SlateEditor = ({ value, onChange, placeholder }) => {
         <div className="border border-gray-300 rounded-md">
             <Slate editor={editor} initialValue={initialValue} onChange={onChange}>
                 <div className="flex items-center p-2 border-b border-gray-200 bg-gray-50 gap-1 flex-wrap">
+                    {/* ... Other Toolbar Buttons ... */}
                     <ToolbarButton type="mark" format="bold" icon={<Bold size={16} />} />
                     <ToolbarButton type="mark" format="italic" icon={<Italic size={16} />} />
                     <ToolbarButton type="mark" format="underline" icon={<Underline size={16} />} />
@@ -150,6 +167,8 @@ const SlateEditor = ({ value, onChange, placeholder }) => {
                     <ToolbarButton type="block" format="block-quote" icon={<Quote size={16} />} />
                     <ToolbarButton type="block" format="numbered-list" icon={<ListOrdered size={16} />} />
                     <ToolbarButton type="block" format="bulleted-list" icon={<List size={16} />} />
+                    <div className="w-px h-5 bg-gray-300 mx-2" />
+                    <InsertImageButton />
                 </div>
                 <Editable
                     renderElement={renderElement}
@@ -159,8 +178,7 @@ const SlateEditor = ({ value, onChange, placeholder }) => {
                         for (const hotkey in HOTKEYS) {
                             if (isHotkey(hotkey, event)) {
                                 event.preventDefault();
-                                const mark = HOTKEYS[hotkey];
-                                CustomEditor.toggleMark(editor, mark);
+                                CustomEditor.toggleMark(editor, HOTKEYS[hotkey]);
                             }
                         }
                     }}
@@ -168,6 +186,84 @@ const SlateEditor = ({ value, onChange, placeholder }) => {
                 />
             </Slate>
         </div>
+    );
+};
+
+
+// ✨ --- UPDATED IMAGE BUTTON --- ✨
+const InsertImageButton = () => {
+    const editor = useSlate();
+    const fileInputRef = useRef(null);
+
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const url = reader.result;
+                CustomEditor.insertImage(editor, url);
+            };
+            reader.readAsDataURL(file);
+        }
+        // Reset the input value to allow selecting the same file again
+        event.target.value = null;
+    };
+
+    return (
+        <>
+            <button
+                type="button"
+                className="p-2 rounded hover:bg-gray-200"
+                onMouseDown={event => {
+                    event.preventDefault();
+                    fileInputRef.current.click();
+                }}
+            >
+                <ImageIcon size={16} />
+            </button>
+            <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                accept="image/*"
+                onChange={handleFileChange}
+            />
+        </>
+    );
+};
+
+// This helper is no longer strictly needed by the button, but is good for the drag-drop/paste feature
+const isImageUrl = url => {
+    if (!url) return false;
+    try {
+        const ext = new URL(url).pathname.split('.').pop();
+        return ['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(ext);
+    } catch {
+        return false;
+    }
+};
+
+const ToolbarButton = ({ format, icon, type = 'mark' }) => {
+    const editor = useSlate();
+    const isActive = type === 'mark'
+        ? CustomEditor.isMarkActive(editor, format)
+        : CustomEditor.isBlockActive(editor, format);
+    
+    return (
+        <button
+            type="button"
+            className={`p-2 rounded ${isActive ? 'bg-gray-300' : 'hover:bg-gray-200'}`}
+            onMouseDown={event => {
+                event.preventDefault();
+                if (type === 'mark') {
+                    CustomEditor.toggleMark(editor, format);
+                } else {
+                    CustomEditor.toggleBlock(editor, format);
+                }
+            }}
+        >
+            {icon}
+        </button>
     );
 };
 

@@ -1,5 +1,3 @@
-// src/components/SlateViewer.js
-
 import React, { useMemo, useCallback } from 'react';
 import { createEditor } from 'slate';
 import { Slate, Editable, withReact } from 'slate-react';
@@ -20,6 +18,22 @@ const Element = ({ attributes, children, element }) => {
       return <li style={style} {...attributes}>{children}</li>;
     case 'numbered-list':
       return <ol style={style} {...attributes} className="list-decimal ml-8">{children}</ol>;
+    
+    // ✨ ADD THIS CASE TO RENDER IMAGES
+    case 'image':
+      return (
+        <div {...attributes} style={style}>
+          <div contentEditable={false}>
+            <img
+              src={element.url}
+              alt=""
+              className="block max-w-full max-h-80" // Makes image responsive
+            />
+          </div>
+          {children}
+        </div>
+      );
+
     default:
       return <p style={style} {...attributes}>{children}</p>;
   }

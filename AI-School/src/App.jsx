@@ -123,6 +123,7 @@ import PaymentSuccess from './components/student/PaymentSuccess'
 import PaystackTest from './components/student/PaystackTest';
 import Profile from './components/student/Profile';
 import Progress from './components/student/Progress';
+import GuideDetails from './components/student/GuideDetails';
 
 // Admin Components
 import AdminDashboard from './components/admin/AdminDashboard'
@@ -131,7 +132,7 @@ import StudentEnrollments from './components/admin/StudentEnrollments'
 import UploadCourseForm from './components/admin/UploadCourseForm'
 import SuccessPage from './components/admin/SuccessPage';
 import EditCourse from './components/admin/EditCourse';
-import AddUser from './components/admin/AddUser';
+import CreateGuide from './components/admin/CreateGuide';
 
 // Layout Components
 import AdminLayout from './components/layouts/AdminLayout'
@@ -163,6 +164,7 @@ const App = () => {
           <Route path="dashboard" element={<StudentDashboard />} />
           <Route path="courseslist" element={<CourseList />} />
           <Route path='guides' element={<Guides />} />
+          <Route path='guides/:guideId' element={<GuideDetails />} />
           <Route path='courses' element={<Courses />} />
           <Route path="courses/:courseId" element={<CourseDetails />} />
           <Route path="enrolled-courses" element={<EnrolledCourses />} />
@@ -194,7 +196,7 @@ const App = () => {
           <Route path="upload-course" element={<UploadCourseForm />} />
           <Route path="enrollments" element={<StudentEnrollments />} />
           <Route path="/admin/edit-course/:courseId" element={<EditCourse />} /> 
-          <Route path="/admin/add-user" element={<AddUser />} />
+          <Route path="create-guide" element={<CreateGuide />} />
 
 
         </Route>

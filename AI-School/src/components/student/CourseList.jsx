@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Bookmark } from 'lucide-react';
-import { useNavigate } from 'react-router-dom'; // Changed from Link to useNavigate
-import { collection, getDocs, doc, getDoc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
+import { collection, getDocs, doc, getDoc, query } from 'firebase/firestore';
 import { db, auth } from '../../lib/firebaseConfig'; 
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -13,20 +13,19 @@ const CourseList = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const coursesPerPage = 4;
   
-  // --- NEW: State to hold the current user and their enrolled courses ---
   const [user, setUser] = useState(null);
   const [userEnrolledCourseIds, setUserEnrolledCourseIds] = useState([]);
   const navigate = useNavigate();
 
-  // --- NEW: Effect to get the current user's authentication state ---
+  // --- Effect to get the current user's authentication state ---
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
     });
-    return () => unsubscribe(); // Cleanup on unmount
+    return () => unsubscribe();
   }, []);
 
-  // --- NEW: Effect to fetch the user's enrolled courses once they are logged in ---
+  // --- Effect to fetch the user's enrolled courses once they are logged in ---
   useEffect(() => {
     if (user) {
       const userDocRef = doc(db, 'users', user.uid);
@@ -36,24 +35,29 @@ const CourseList = () => {
         }
       });
     } else {
-      // If user logs out, clear their enrolled courses
       setUserEnrolledCourseIds([]);
     }
   }, [user]);
 
-  // Fetch all courses from Firestore
+  // --- Data fetching logic to get all courses and filter out guides ---
   useEffect(() => {
     const fetchCourses = async () => {
+      setLoading(true);
       try {
         const querySnapshot = await getDocs(collection(db, 'courses'));
-        const courseData = querySnapshot.docs.map(doc => ({
+        
+        const allContent = querySnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
+
+        // Filter out any content that is explicitly a 'guide'
+        const courseData = allContent.filter(item => item.contentType !== 'guide');
+
         setCourses(courseData);
-        setLoading(false);
       } catch (err) {
         setError('Failed to fetch courses: ' + err.message);
+      } finally {
         setLoading(false);
       }
     };
@@ -61,14 +65,13 @@ const CourseList = () => {
     fetchCourses();
   }, []);
   
-  // --- NEW: Handler to decide where to navigate ---
+  // --- Handler to decide where to navigate ---
   const handleCourseClick = (courseId) => {
-    // If the user's enrolled list includes this course ID, go to the course player
     if (userEnrolledCourseIds.includes(courseId)) {
       navigate(`/student/courses/${courseId}`);
     } else {
-      // Otherwise, go to the checkout page
-      navigate(`/student/course/${courseId}`);
+      // The original code had a typo here, it should go to checkout
+      navigate(`/student/checkout/${courseId}`);
     }
   };
 
@@ -86,11 +89,11 @@ const CourseList = () => {
   };
 
   if (loading) {
-    return <div>Loading courses...</div>;
+    return <div className="p-4">Loading courses...</div>;
   }
 
   if (error) {
-    return <div className="text-red-600">{error}</div>;
+    return <div className="p-4 text-red-600">{error}</div>;
   }
 
   return (
@@ -118,7 +121,6 @@ const CourseList = () => {
 
         <div ref={scrollRef} className="flex flex-wrap gap-6 pb-4 pr-6">
           {getCurrentCourses().map((course) => (
-            // --- CHANGED: Replaced <Link> with a <div> and an onClick handler ---
             <div
               key={course.id}
               onClick={() => handleCourseClick(course.id)}
@@ -154,7 +156,7 @@ const CourseList = () => {
                   {course.shortDescription && course.shortDescription.split(' ').length > 25
                     ? course.shortDescription.split(' ').slice(0, 18).join(' ') + '...'
                     : course.shortDescription}
-              </p>
+                </p>
                 <div className="flex flex-wrap gap-1 text-xs text-gray-500">
                   {course.tags && course.tags.map((tag, i) => (
                     <span className="bg-green-200 text-gray-800 rounded-full px-2 py-1" key={i}>{tag}</span>
