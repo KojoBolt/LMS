@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// NEW: Import CheckCircle for UI feedback
 import { ChevronLeft, ChevronRight, GraduationCap, CheckCircle } from 'lucide-react';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore, collection, getDocs, query, where, limit, doc, getDoc, setDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
@@ -222,7 +221,7 @@ const CourseDetails = () => {
     const isCurrentLessonCompleted = currentLesson && completedLessons.has(currentLesson.id);
 
     return (
-        <div className="min-h-screen bg-gray-50 ml-[300px]">
+        <div className="min-h-screen bg-gray-100 lg:ml-[300px] sm:mt-[60px] mt-[60px] lg:mt-0">
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="mb-8">
                     <h1 className="text-4xl font-bold text-gray-900 mb-2">{course.courseTitle}</h1>
@@ -248,7 +247,7 @@ const CourseDetails = () => {
                             )}
                         </div>
 
-                        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm">
+                        <div className="bg-white rounded-lg p-6 mb-6  border border-gray-400">
                             <div className="flex items-center gap-3 mb-4">
                                 <GraduationCap className="w-6 h-6 text-gray-600" />
                                 <h2 className="text-2xl font-semibold text-gray-900">
@@ -256,12 +255,13 @@ const CourseDetails = () => {
                                 </h2>
                             </div>
                             
-                            <div className="text-gray-700 text-lg leading-relaxed mb-6 prose max-w-none">
+                            <div className="text-gray-700 text-lg leading-relaxed mb-6 prose max-w-none ">
                                 {/* SlateViewer remains the same */}
                                 {currentLesson?.content ? (
                                     <SlateViewer
                                         key={currentLesson.id} 
                                         value={currentLesson.content}
+                                        className="prose prose-lg max-w-none"
                                     />
                                 ) : (
                                     <p>{course.shortDescription}</p> 
@@ -269,7 +269,7 @@ const CourseDetails = () => {
                             </div>
 
                             {/* MODIFIED: Navigation buttons now include a Mark as Complete button */}
-                            <div className="flex justify-between items-center">
+                            <div className="flex flex-wrap justify-center sm:justify-between items-center gap-4">
                                 <button
                                     onClick={goToPreviousLesson}
                                     disabled={isFirstLesson}
@@ -307,7 +307,7 @@ const CourseDetails = () => {
 
                     <div className="lg:col-span-1">
                         {/* DYNAMIC: Progress bar UI now uses dynamic values */}
-                        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm">
+                        <div className="bg-white rounded-lg p-6 mb-6 border border-gray-400">
                             <div className="flex justify-between items-center mb-3">
                                 <h3 className="text-lg font-semibold text-gray-900">Course Progress</h3>
                                 <span className="text-sm text-gray-500">{Math.round(progressPercentage)}% Complete</span>
@@ -317,7 +317,7 @@ const CourseDetails = () => {
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-lg p-6 shadow-sm">
+                        <div className="bg-white rounded-lg p-6 border border-gray-400 mb-16 lg:mb-0">
                             <h3 className="text-lg font-semibold text-gray-900 mb-4">Course Content</h3>
                             
                             <div className="space-y-4">

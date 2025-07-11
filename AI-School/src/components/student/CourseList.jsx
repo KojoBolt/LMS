@@ -11,7 +11,7 @@ const CourseList = () => {
   const [error, setError] = useState(null);
   const scrollRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const coursesPerPage = 4;
+  const coursesPerPage = 3;
   
   const [user, setUser] = useState(null);
   const [userEnrolledCourseIds, setUserEnrolledCourseIds] = useState([]);
@@ -124,7 +124,7 @@ const CourseList = () => {
             <div
               key={course.id}
               onClick={() => handleCourseClick(course.id)}
-              className="w-full sm:w-[48%] md:w-[31%] lg:w-[23%] bg-gray-50 rounded-xl transition-transform duration-200 hover:scale-[1.01] overflow-hidden border border-gray-200 hover:border-gray-300 cursor-pointer"
+              className="w-full sm:w-[48%] md:w-[31%] lg:w-[23%] bg-gray-100 rounded-xl transition-transform duration-200 hover:scale-[1.01] overflow-hidden border border-gray-700 hover:border-gray-900 cursor-pointer"
             >
               <div className="relative h-[180px] rounded-t-xl overflow-hidden">
                 <img

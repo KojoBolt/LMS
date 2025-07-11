@@ -1,16 +1,16 @@
 import React from "react";
-import { Shapes, Video, Landmark, ChartNoAxesCombined, CircleDollarSign, ChartColumnBig, SquareChartGantt, SquareArrowDown } from 'lucide-react';
+import { Shapes, Video, Landmark, ChartNoAxesCombined, CircleDollarSign, ChartColumnBig, SquareChartGantt, SquareArrowDown, HeartHandshake, BadgePoundSterling, Laptop, GraduationCap } from 'lucide-react';
 
 const topics = [
   { label: "General", icon:<Shapes className="text-gray-500" /> },
-  { label: "Coding", icon: "💻" },
-  { label: "Marketing", icon: "📢" },
+  { label: "Coding", icon: <Laptop className="text-gray-500" /> },
+  { label: "Marketing", icon: <BadgePoundSterling className="text-gray-500" /> },
   { label: "Content creator", icon: <Video className="text-red-500" /> },
-  { label: "Educator", icon: "🎓" },
+  { label: "Educator", icon:  <GraduationCap className='text-green-700' /> },
   { label: "Business operations", icon: <Landmark className="text-blue-500" /> },
   { label: "Sales", icon: <ChartNoAxesCombined className="text-green-600" /> },
   { label: "Finance", icon: <CircleDollarSign className="text-emerald-500" /> },
-  { label: "Consulting", icon: "💡👥" },
+  { label: "Consulting", icon: <HeartHandshake className="text-pink-500" /> },
   { label: "Data analysis", icon: <ChartColumnBig className="text-purple-500" /> },
   { label: "Project management", icon: <SquareChartGantt className="text-yellow-500" /> },
   { label: "Others", icon: <SquareArrowDown className="text-gray-400" /> },

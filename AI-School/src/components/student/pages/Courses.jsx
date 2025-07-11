@@ -6,7 +6,7 @@ import { db, auth } from '../../../lib/firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import badgeImage from '../../../assets/images/badge.png'; 
 
-// Helper object to map categories to colors for the UI
+
 const categoryStyles = {
     'General': { badge: 'bg-purple-200', cert: 'border-indigo-400 text-indigo-400' },
     'design': { badge: 'bg-blue-200', cert: 'border-blue-400 text-blue-400' },
@@ -38,7 +38,7 @@ const Courses = () => {
         return () => unsubscribe();
     }, []);
 
-    // --- Effect to fetch all necessary data ---
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -52,7 +52,8 @@ const Courses = () => {
                 }));
 
                 // 2. Filter out the guides on the client-side to only keep courses
-                const courseData = allContent.filter(item => item.contentType !== 'guide');
+                const courseData = allContent.filter(item => item.contentType !== 'guide' && item.contentType !== 'workshop');
+
 
                 setAllCourses(courseData);
                 setFilteredCourses(courseData);
@@ -100,7 +101,7 @@ const Courses = () => {
     }
 
     return (
-        <div className="p-8 max-w-7xl ml-[300px]">
+        <div className="p-4 lg:ml-[300px] mb-[60px] lg:mb-0">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-3xl font-bold">Courses</h2>
                 <button onClick={() => setSelectedCategory('All categories')} className="text-sm px-4 py-2 border border-gray-400 rounded-full hover:bg-gray-100">Clear filters</button>
@@ -130,8 +131,8 @@ const Courses = () => {
                             className="bg-gray-100 border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition duration-200 cursor-pointer"
                         >
                             <div className="relative bg-black text-white p-9">
-                                <div className='w-[60%]'>
-                                    <h3 className="text-lg font-semibold mb-2">{course.courseTitle}</h3>
+                                <div className='w-full'>
+                                    <h3 className="text-lg font-semibold mb-2 break-words">{course.courseTitle}</h3>
                                 </div>
                                 <div className="w-[60%]">
                                     <p className="text-sm mb-4 h-10 truncate">{course.shortDescription}</p>
@@ -141,7 +142,7 @@ const Courses = () => {
                                 >
                                     {isEnrolled ? 'Continue Learning' : 'Get Certification'}
                                 </button>
-                                <div className={`absolute top-0 right-0 h-full w-28 ${style.badge} flex items-center justify-center text-[10px] font-semibold text-center p-1 mr-4 [clip-path:polygon(0_0,100%_0,100%_90%,50%_100%,0_90%)]`}>
+                                <div className={`absolute top-0 right-0 h-full w-25 ${style.badge} flex items-center justify-center text-[10px] font-semibold text-center p-1 mr-4 [clip-path:polygon(0_0,100%_0,100%_90%,50%_100%,0_90%)]`}>
                                     <div className='text-[15px] text-black'>
                                         {course.courseCategory}
                                         <div className="mt-[60px] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">

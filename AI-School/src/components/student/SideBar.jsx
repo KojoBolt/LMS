@@ -11,8 +11,8 @@ const menu = [
     { icon: <BookOpen size={18} />, label: "Courses", path: "/student/courses" },
     { icon: <Compass size={18} />, label: "Guides", path: "/student/guides" },
     { icon: <Calendar size={18} />, label: "Workshops", path: "/student/workshops" },
-    { icon: <Users size={18} />, label: "Events", path: "/student/events" },
-    { icon: <Users size={18} />, label: "Community", path: "/student/community" },
+    // { icon: <Users size={18} />, label: "Events", path: "/student/events" },
+    { icon: <User size={18} />, label: "My Profile", path: "/student/profile" },
     { icon: <Gift size={18} />, label: "Perks", path: "/student/perks" },
 ];
 
@@ -94,11 +94,11 @@ const SideBar = ({ onSearchChange }) => {
     const inactiveLinkStyle = "flex items-center gap-3 text-[15px] text-gray-700 hover:text-black p-2";
 
     return (
-        <div className="bg-[#FAFAFA] fixed border border-r-[#E3E3E3] border-b-0 border-t-0 h-screen w-[300px] p-4 flex flex-col justify-between top-0 left-0 z-50 overflow-x-hidden">
+        <div className="bg-[#FAFAFA] fixed border border-r-[#E3E3E3] border-b-0 border-t-0 h-screen w-[300px] p-4 lg:flex flex-col justify-between top-0 left-0 z-50 overflow-x-hidden sm:hidden md:hidden hidden">
             <div>
-                <div className="text-xl font-bold mb-6 ">
-                    <span className="text-black">The Rundown</span>
-                    <span className="text-purple-600"> University</span>
+                <div className="text-xl font-bold mb-6 m-auto text-center">
+                    <span className="text-black">AI</span>
+                    <span className="text-purple-600"> School </span>
                 </div>
                 <div>
                     

@@ -233,19 +233,19 @@ const CourseDescriptionPage = () => {
     };
 
     if (loading) {
-        return <div className="flex justify-center items-center h-screen ml-[300px]"><p>Loading course...</p></div>;
+        return <div className="flex justify-center items-center h-screen lg:ml-[300px]"><p>Loading course...</p></div>;
     }
 
     if (error) {
-        return <div className="flex justify-center items-center h-screen ml-[300px]"><p className="text-red-500">{error}</p></div>;
+        return <div className="flex justify-center items-center h-screen lg:ml-[300px]"><p className="text-red-500">{error}</p></div>;
     }
     
     if (!course) {
-        return <div className="flex justify-center items-center h-screen ml-[300px]"><p>No course data available.</p></div>;
+        return <div className="flex justify-center items-center h-screen lg:ml-[300px]"><p>No course data available.</p></div>;
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-[#DDFBFE] via-[#DDFBFE] to-[#FCFCFC] ml-[300px]">
+        <div className="min-h-screen bg-gradient-to-b from-[#DDFBFE] via-[#DDFBFE] to-[#FCFCFC] lg:ml-[300px] mb-[65px]">
             <div className="max-w-7xl mx-auto px-4 py-8">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Main Content */}

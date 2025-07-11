@@ -84,7 +84,7 @@ const Dashboard = () => {
     // --- This is the single loading state for the entire page ---
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-screen ml-[300px]">
+            <div className="flex justify-center items-center h-screen lg:ml-[300px]">
                 <div className="w-12 h-12 border-4 border-black-600 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
@@ -95,7 +95,7 @@ const Dashboard = () => {
     }
 
     return (
-        <div className="p-6 w-[ calc(100vw - 300px)] max-w-[calc(100vw - 300px)] ml-[300px] overflow-auto overflow-x-hidden bg-white">
+        <div className="p-6 w-[ calc(100vw - 300px)] max-w-[calc(100vw - 300px)] lg:ml-[300px] overflow-auto overflow-x-hidden bg-white mt-4 lg:mt-0">
             {/* Pass the fetched data down to the child components as props */}
             <MainContent enrolledCourses={filteredEnrolledCourses} />
             <div className="mt-10">
@@ -104,7 +104,7 @@ const Dashboard = () => {
                     userEnrolledCourseIds={userEnrolledCourseIds} 
                 />
             </div>
-            <div className="mt-10">
+            <div className="mt-6 mb-9 lg:mb-0">
                 <Categories />
             </div>
         </div>

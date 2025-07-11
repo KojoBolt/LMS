@@ -324,7 +324,7 @@ const Checkout = () => {
     const currency = 'GHS';
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 ml-[300px]">
+        <div className="min-h-screen bg-gray-50 py-8 lg:ml-[300px] mt-[60px] lg:mt-0 mb-[60px] lg:mb-0">
             <div className="max-w-6xl mx-auto px-4">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">

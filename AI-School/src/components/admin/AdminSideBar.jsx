@@ -7,7 +7,7 @@ const menu = [
   { icon: <BookOpen size={18} />, label: "My Courses", path: "/admin/courses" },
   { icon: <Compass size={18} />, label: "Student Enrollment", path: "/admin/enrollments" },
   { icon: <UserPlus size={18} />, label: "Create Guide", path: "/admin/create-guide" },
-  { icon: <Users size={18} />, label: "Events", path: "/admin/events" },
+  { icon: <Users size={18} />, label: "Add Workshop", path: "/admin/add-workshop" },
   { icon: <Users size={18} />, label: "Community", path: "/admin/community" },
   { icon: <Gift size={18} />, label: "Perks", path: "/admin/perks" },
 ];

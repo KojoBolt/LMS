@@ -124,6 +124,7 @@ import PaystackTest from './components/student/PaystackTest';
 import Profile from './components/student/Profile';
 import Progress from './components/student/Progress';
 import GuideDetails from './components/student/GuideDetails';
+import WorkshopDetails from './components/student/pages/WorkshopDetails';
 
 // Admin Components
 import AdminDashboard from './components/admin/AdminDashboard'
@@ -133,6 +134,7 @@ import UploadCourseForm from './components/admin/UploadCourseForm'
 import SuccessPage from './components/admin/SuccessPage';
 import EditCourse from './components/admin/EditCourse';
 import CreateGuide from './components/admin/CreateGuide';
+import WorkshopForm from './components/admin/WorkshopForm';
 
 // Layout Components
 import AdminLayout from './components/layouts/AdminLayout'
@@ -177,6 +179,7 @@ const App = () => {
           <Route path="test/payment" element={<PaystackTest />} />
           <Route path="profile" element={<Profile />} />
           <Route path="progress" element={<Progress />} />
+          <Route path="workshops/:workshopId" element={<WorkshopDetails />} />
 
       
         </Route>
@@ -197,6 +200,8 @@ const App = () => {
           <Route path="enrollments" element={<StudentEnrollments />} />
           <Route path="/admin/edit-course/:courseId" element={<EditCourse />} /> 
           <Route path="create-guide" element={<CreateGuide />} />
+          <Route path="add-workshop" element={<WorkshopForm />} />
+
 
 
         </Route>

@@ -62,7 +62,7 @@ const Guides = () => {
     };
 
     if (loading) {
-        return <div className="p-8 ml-[300px]">Loading guides...</div>;
+        return <div className="p-8 lg:ml-[300px]">Loading guides...</div>;
     }
 
     if (error) {
@@ -84,7 +84,7 @@ const Guides = () => {
 };
 
     return (
-        <div className="max-w-7xl mx-auto p-6 bg-white ml-[300px]">
+        <div className="max-w-7xl mx-auto p-6 bg-white lg:ml-[300px] mt-[60px] lg:mt-0 mb-[60px] lg:mb-0 overflow-auto overflow-x-hidden">
             <h1 className="text-4xl font-bold text-gray-900 mb-8">Guides</h1>
             
             <div className="flex items-center gap-4 mb-8">

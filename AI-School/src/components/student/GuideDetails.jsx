@@ -73,7 +73,7 @@ const GuideDetails = () => {
     }, [guideId]);
 
     if (loading) {
-        return <div className="flex justify-center items-center h-screen ml-[300px]"><p>Loading guide...</p></div>;
+        return <div className="flex justify-center items-center h-screen lg:ml-[300px]"><p>Loading guide...</p></div>;
     }
 
     if (error) {
@@ -85,16 +85,14 @@ const GuideDetails = () => {
     }
 
     return (
-        <div className="min-h-screen bg-white ml-[300px]">
+        <div className="min-h-screen bg-white lg:ml-[300px] mb-[60px] lg:mb-0 mt-[60px] lg:mt-0">
             <div className="max-w-7xl mx-auto px-4 py-12">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Main Content Area */}
                     <div className="lg:col-span-2">
                         <h1 className="text-4xl font-bold text-gray-900 mb-6">{guide.courseTitle}</h1>
                         
-                        {/* --- THIS IS THE FIX --- */}
-                        {/* The main overview video has been removed. */}
-                        {/* The component now directly maps over the lessons to display each article. */}
+                       
                         <div className="space-y-12">
                             {guide.sections && guide.sections[0]?.lessons.map(lesson => (
                                 <div key={lesson.id}>
