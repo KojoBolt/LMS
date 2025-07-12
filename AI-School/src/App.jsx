@@ -135,6 +135,7 @@ import SuccessPage from './components/admin/SuccessPage';
 import EditCourse from './components/admin/EditCourse';
 import CreateGuide from './components/admin/CreateGuide';
 import WorkshopForm from './components/admin/WorkshopForm';
+import AdminProfile from './components/admin/AdminProfile';
 
 // Layout Components
 import AdminLayout from './components/layouts/AdminLayout'
@@ -201,6 +202,7 @@ const App = () => {
           <Route path="/admin/edit-course/:courseId" element={<EditCourse />} /> 
           <Route path="create-guide" element={<CreateGuide />} />
           <Route path="add-workshop" element={<WorkshopForm />} />
+          <Route path="profile" element={<AdminProfile />} />
 
 
 

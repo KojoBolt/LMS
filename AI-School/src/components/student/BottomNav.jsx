@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { Home, BookOpen, Compass, Briefcase, MoreHorizontal, Users, Gift, Settings, LogOut } from 'lucide-react';
-
+import { auth } from '../../lib/firebaseConfig';
+import { signOut } from 'firebase/auth';
 
 const mainMenuItems = [
     { icon: <Home size={24} />, label: "Home", path: "/student/dashboard" },
@@ -10,21 +11,19 @@ const mainMenuItems = [
     { icon: <Briefcase size={24} />, label: "Workshops", path: "/student/workshops" },
 ];
 
-
 const moreMenuItems = [
-    { icon: <Users size={18} />, label: "Community", path: "/student/community" },
-    { icon: <Gift size={18} />, label: "Perks", path: "/student/perks" },
+    // { icon: <Users size={18} />, label: "Community", path: "/student/community" },
+    // { icon: <Gift size={18} />, label: "Perks", path: "/student/perks" },
     { icon: <Settings size={18} />, label: "Settings", path: "/student/profile" },
 ];
 
 const BottomNav = () => {
-   
     const [isMorePopupOpen, setIsMorePopupOpen] = useState(false);
     const morePopupRef = useRef(null);
+    const navigate = useNavigate(); 
 
     const activeLinkStyle = "flex flex-col items-center text-white";
     const inactiveLinkStyle = "flex flex-col items-center text-gray-400 hover:text-white transition-colors duration-200";
-
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -37,6 +36,17 @@ const BottomNav = () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, []);
+
+   
+    const handleLogout = async () => {
+        try {
+            await signOut(auth);
+            setIsMorePopupOpen(false);
+            navigate('/login');
+        } catch (error) {
+            console.error("Error signing out: ", error);
+        }
+    };
 
     return (
         <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-black z-40 border-t border-black-200 shadow-lg">
@@ -76,6 +86,14 @@ const BottomNav = () => {
                                     {item.label}
                                 </Link>
                             ))}
+                            <div className="my-1 border-t border-gray-100"></div>
+                            <button 
+                                onClick={handleLogout}
+                                className="w-full text-left flex items-center gap-3 px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-md"
+                            >
+                                <LogOut size={16} />
+                                Log out
+                            </button>
                         </div>
                     )}
                 </div>

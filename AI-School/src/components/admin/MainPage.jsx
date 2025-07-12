@@ -195,46 +195,49 @@ const MainPage = () => {
   const totalPages = Math.ceil(totalCoursesCount / coursesPerPage); 
 
   return (
-    <div className="min-h-screen ">
-      {/* Header Section */}
-      <div className="bg-gradient-to-r from-blue-900 to-blue-700 h-[200px] rounded-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full -translate-y-24 translate-x-24"></div>
+    <div className="min-h-screen overflow-x-hidden">
+    <div className="bg-gradient-to-r from-blue-900 to-blue-700 h-[200px] sm:h-[200px] rounded-2xl relative overflow-hidden max-w-[100%] mt-[65px] lg:mt-0 mx-auto shadow-lg">
+  <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full -translate-y-24 translate-x-24"></div>
+  <div className="absolute bottom-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full translate-y-12 translate-x-12"></div>
+  <div className="p-4 sm:p-6 lg:p-12 relative z-10 h-full">
+    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between h-full">
+      {/* Profile Section */}
+      <div className="flex items-center space-x-3 sm:space-x-4 mb-4 lg:mb-0">
         <div className="absolute bottom-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full translate-y-12 translate-x-12"></div>
-        <div className="p-12 relative z-10">
-          <div className="flex items-center justify-between">
-            {/* Profile Section */}
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <img
-                  src={adminUser?.profilePicUrl || "https://img.freepik.com/free-photo/african-teenage-girl-portrait-happy-smiling-face_53876-146757.jpg?uid=R160851296&ga=GA1.1.1292176217.1739379214&semt=ais_hybrid&w=740"}
-                  alt={adminUser?.name || "Admin User"}
-                  className="w-22 h-22 rounded-full border-4 border-white shadow-lg"
-                />
-                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white"></div>
-              </div>
-              <div className="text-white">
-                <h1 className="text-2xl font-bold flex items-center gap-2">
-                  {loadingUser ? "Loading..." : (adminUser?.name || "Guest User")}
-                </h1>
-                <p className="text-purple-200 text-lg">{loadingUser ? "Loading..." : (adminUser?.role || "Visitor")}</p>
-              </div>
-            </div>
-            {/* Action Buttons */}
-            <div className="flex items-center space-x-3">
-              <button className="bg-white text-purple-700 px-6 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors">
-                Add New Course
-              </button>
-              <button className="bg-red-500 text-white px-6 py-2 rounded-full font-medium hover:bg-red-600 transition-colors">
-                Student Dashboard
-              </button>
-            </div>
-          </div>
+        <div className="relative">
+          <img
+            src={adminUser?.profilePicUrl || "https://img.freepik.com/free-photo/african-teenage-girl-portrait-happy-smiling-face_53876-146757.jpg?uid=R160851296&ga=GA1.1.1292176217.1739379214&semt=ais_hybrid&w=740"}
+            alt={adminUser?.name || "Admin User"}
+            className="w-16 h-16 sm:w-20 sm:h-20 lg:w-22 lg:h-22 rounded-full border-4 border-white shadow-lg"
+          />
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 sm:w-6 sm:h-6 bg-green-500 rounded-full border-2 border-white"></div>
+        </div>
+        <div className="text-white">
+          <h1 className="text-lg sm:text-xl lg:text-2xl font-bold flex items-center gap-2">
+            {loadingUser ? "Loading..." : (adminUser?.name || "Guest User")}
+          </h1>
+          <p className="text-purple-200 text-sm sm:text-base lg:text-lg">
+            {loadingUser ? "Loading..." : (adminUser?.role || "Visitor")}
+          </p>
         </div>
       </div>
+      
+      {/* Action Buttons */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-3 mt-auto lg:mt-0 w-[70%] sm:w-auto">
+        <button className="bg-white text-purple-700 px-4 sm:px-6 py-2 rounded-full font-medium hover:bg-gray-100 transition-colors text-sm sm:text-base">
+          Add New Course
+        </button>
+        <button className="bg-red-500 text-white px-4 sm:px-6 py-2 rounded-full font-medium hover:bg-red-600 transition-colors text-sm sm:text-base">
+          Student Dashboard
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
       {/* Stats Grid */}
-      <div className="px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="px-2 py-8 lg:px-12 lg:py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-[100%]">
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between">
               <div>
@@ -307,7 +310,7 @@ const MainPage = () => {
       </div>
 
       {/* Courses Section */}
-      <div className="mx-auto p-6">
+      <div className="mx-auto p-2 lg:p-8 max-w-7xl mb-[60px] lg:mb-0">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">Recently Created Courses</h1>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="grid grid-cols-4 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200 rounded-t-lg">

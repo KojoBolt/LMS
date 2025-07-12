@@ -452,7 +452,7 @@ const Checkout = () => {
                             <h2 className="text-lg font-semibold mb-6">Payment Method</h2>
                             <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
                                 <div className="flex items-center mb-4">
-                                    <img src={paystackLogo} alt="Paystack" className="w-24"/>
+                                    <img src={paystackLogo} alt="Paystack" className="w-18 rounded-2xl"/>
                                 </div>
                                 <p className="text-sm text-gray-600">
                                     You will be redirected to Paystack's secure checkout to complete your payment.

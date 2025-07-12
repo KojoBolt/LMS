@@ -1,18 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Bell, User } from 'lucide-react';
-import { auth, db } from '../../lib/firebaseConfig'; // Adjust path if needed
+import { auth, db } from '../../lib/firebaseConfig'; 
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 
 const MobileHeader = () => {
-    // --- NEW: State for popup visibility and notifications ---
     const [isNotificationPopupOpen, setIsNotificationPopupOpen] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [user, setUser] = useState(null);
     const notificationPopupRef = useRef(null);
 
-    // --- NEW: Effect to get the current user ---
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
@@ -20,7 +18,6 @@ const MobileHeader = () => {
         return () => unsubscribe();
     }, []);
 
-    // --- NEW: Effect to fetch notifications for the logged-in user ---
     useEffect(() => {
         if (user) {
             const notificationsQuery = query(collection(db, 'notifications'), where("userId", "==", user.uid));
@@ -34,7 +31,6 @@ const MobileHeader = () => {
         }
     }, [user]);
 
-    // --- NEW: Effect to handle clicks outside the popup to close it ---
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (notificationPopupRef.current && !notificationPopupRef.current.contains(event.target)) {
@@ -50,17 +46,17 @@ const MobileHeader = () => {
     return (
         <div className="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-sm p-4 z-40">
             <div className="flex justify-between items-center">
-                {/* Logo */}
+                
                 <div className="text-xl font-bold">
                     <span className="text-gray-800">The AI</span>
                     <span className="text-purple-600">School</span>
                 </div>
 
-                {/* Icons */}
+                
                 <div className="flex items-center space-x-4">
-                    <Search size={22} className="text-gray-600" />
+                    {/* <Search size={22} className="text-gray-600" /> */}
                     
-                    {/* --- UPDATED: Notification Bell is now a button with a popup --- */}
+                    
                     <div className="relative" ref={notificationPopupRef}>
                         <button onClick={() => setIsNotificationPopupOpen(prev => !prev)} className="relative">
                             <Bell size={22} className="text-gray-600" />
@@ -89,7 +85,6 @@ const MobileHeader = () => {
                         )}
                     </div>
 
-                    {/* --- UPDATED: User icon is now a link to the profile page --- */}
                     <Link to="/student/profile">
                         <User size={22} className="text-gray-600" />
                     </Link>

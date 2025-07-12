@@ -142,15 +142,14 @@ const Workshops = () => {
                 {filteredWorkshops.map((workshop) => {
                     const isEnrolled = userEnrolledCourseIds.has(workshop.id);
                     
-                    // --- THIS IS THE CORRECTED LOGIC ---
-                    // A workshop is accessible if it's free OR the user is enrolled.
+                   
                     const isAccessible = workshop.isFree || isEnrolled;
 
                     return (
                         <Link 
                             to={isAccessible ? `/student/workshops/${workshop.id}` : `/student/checkout/${workshop.id}`}
                             key={workshop.id} 
-                            className="bg-white rounded-lg overflow-hidden shadow-sm border border-gray-200 hover:shadow-md transition-shadow"
+                            className="bg-gray-50 rounded-lg overflow-hidden border border-gray-300 hover:shadow-md transition-shadow "
                         >
                             <div className="relative bg-black h-48">
                                 <img src={workshop.courseThumbnail || 'https://placehold.co/300x200/111827/FFFFFF?text=Workshop'} alt={workshop.courseTitle} className="w-full h-full object-cover opacity-50"/>

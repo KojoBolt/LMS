@@ -14,7 +14,7 @@ const menu = [
 
 const AdminSideBar = () => {
   return (
-    <div className="bg-[#FAFAFA] fixed border border-r-[#E3E3E3] border-b-0 border-t-0 h-screen w-[300px] p-4 flex flex-col justify-between top-0 left-0 z-100 overflow-x-hidden">
+    <div className="bg-[#FAFAFA] fixed border border-r-[#E3E3E3] border-b-0 border-t-0 h-screen w-[300px] p-4 lg:flex flex-col justify-between top-0 left-0 z-100 overflow-x-hidden hidden">
       <div>
         <div className="text-xl font-bold mb-6 ">
           <span className="text-black">Admin</span>

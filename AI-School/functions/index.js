@@ -1,18 +1,26 @@
+// functions/index.js
+
+// --- Imports for all functions ---
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth"; // Added for admin functions
 import { defineString } from "firebase-functions/params";
 import axios from "axios";
 
-// Initialize Firebase Admin SDK
+// --- Initialize Firebase Services Once at the top ---
 initializeApp();
 const db = getFirestore();
+const adminAuth = getAuth(); // Use a different name to avoid confusion
 
-// Define the Paystack secret key as a parameter
+// --- Define Secrets Once ---
 const paystackSecretKey = defineString("PAYSTACK_SECRET");
 
+
+// ========================================================================
+// --- 1. Your Existing, Working Paystack Verification Function ---
+// ========================================================================
 export const verifyPaystackPayment = onCall(async (request) => {
-  // 1. Check for authentication
   if (!request.auth) {
     console.error("Authentication failed: User not logged in.");
     throw new HttpsError("unauthenticated", "You must be logged in.");
@@ -28,7 +36,6 @@ export const verifyPaystackPayment = onCall(async (request) => {
   }
 
   try {
-    // 2. Verify the transaction with Paystack
     const response = await axios.get(
       `https://api.paystack.co/transaction/verify/${reference}`,
       {
@@ -41,28 +48,23 @@ export const verifyPaystackPayment = onCall(async (request) => {
       throw new HttpsError("internal", "Payment was not successful with Paystack.");
     }
 
-    // 3. Verify the amount paid
+    // NOTE: The Admin SDK uses .get() on a reference, not a separate getDoc() function.
     const courseRef = db.collection("courses").doc(courseId);
-    const courseSnap = await courseRef.get();
+    const courseSnap = await courseRef.get(); 
     if (!courseSnap.exists) {
       throw new HttpsError("not-found", "Course not found.");
     }
 
-    // --- THIS IS THE FIX ---
-    // The logic now correctly checks for a discount price, matching the frontend.
     const coursePrice = parseFloat(courseSnap.data().coursePrice) || 0;
     const discountPrice = parseFloat(courseSnap.data().discountPrice) || 0;
     const expectedAmount = (discountPrice > 0 ? discountPrice : coursePrice);
-    const amountPaid = transactionData.amount / 100; // Amount from Paystack is in kobo/pesewas
+    const amountPaid = transactionData.amount / 100;
 
-    // Use a small tolerance for floating point comparisons
     if (Math.abs(amountPaid - expectedAmount) > 0.01) {
       console.error("Amount validation failed:", { amountPaid, expectedAmount });
       throw new HttpsError("internal", "Paid amount does not match course price.");
     }
-    // --- END OF FIX ---
 
-    // 4. Create enrollment and update earnings in a batch for safety
     const batch = db.batch();
 
     const enrollmentRef = db.collection("enrollments").doc();
@@ -97,5 +99,70 @@ export const verifyPaystackPayment = onCall(async (request) => {
         throw error;
     }
     throw new HttpsError("internal", "An unexpected error occurred during verification.");
+  }
+});
+
+
+// ========================================================================
+// --- 2. Your New Function to Create an Admin User ---
+// ========================================================================
+export const createAdminUser = onCall(async (request) => {
+    if (request.auth?.token.role !== 'admin') {
+        throw new HttpsError('permission-denied', 'Only admins can create other admins.');
+    }
+
+    const { email, password, name, profilePicUrl } = request.data;
+
+    if (!email || !password || !name) {
+        throw new HttpsError('invalid-argument', 'Missing required fields: email, password, and name.');
+    }
+
+    try {
+        const userRecord = await adminAuth.createUser({
+            email: email,
+            password: password,
+            displayName: name,
+            photoURL: profilePicUrl || null,
+        });
+
+        await adminAuth.setCustomUserClaims(userRecord.uid, { role: 'admin' });
+
+        await db.collection('users').doc(userRecord.uid).set({
+            uid: userRecord.uid,
+            name: name,
+            email: email,
+            role: 'admin',
+            profilePicUrl: profilePicUrl || '',
+            createdAt: new Date().toISOString(),
+            enrolledCourses: []
+        });
+
+        return { success: true, uid: userRecord.uid };
+    } catch (error) {
+        console.error('Error creating new admin user:', error);
+        throw new HttpsError('internal', error.message);
+    }
+});
+
+
+// ========================================================================
+// --- 3. Temporary Function to Create the First Admin ---
+// ========================================================================
+export const setInitialAdmin = onCall(async (request) => {
+  if (request.auth?.token.email !== 'kojobolt@gmail.com') {
+    throw new HttpsError('permission-denied', 'You are not authorized to perform this action.');
+  }
+
+  try {
+    const adminUid = request.auth.uid;
+    await adminAuth.setCustomUserClaims(adminUid, { role: 'admin' });
+
+    const userRef = db.collection('users').doc(adminUid);
+    await userRef.set({ role: 'admin' }, { merge: true });
+
+    return { success: true, message: `User ${adminUid} has been made an admin.` };
+  } catch (error) {
+    console.error("Error setting initial admin:", error);
+    throw new HttpsError('internal', 'Failed to set admin role.');
   }
 });
