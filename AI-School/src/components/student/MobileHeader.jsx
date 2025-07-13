@@ -4,6 +4,7 @@ import { Search, Bell, User } from 'lucide-react';
 import { auth, db } from '../../lib/firebaseConfig'; 
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import SideLogo from '../../assets/images/logoblack.png'; 
 
 const MobileHeader = () => {
     const [isNotificationPopupOpen, setIsNotificationPopupOpen] = useState(false);
@@ -48,8 +49,9 @@ const MobileHeader = () => {
             <div className="flex justify-between items-center">
                 
                 <div className="text-xl font-bold">
-                    <span className="text-gray-800">The AI</span>
-                    <span className="text-purple-600">School</span>
+                    {/* <span className="text-gray-800">The AI</span>
+                    <span className="text-purple-600">School</span> */}
+                    <img src={SideLogo} alt="Logo" className='w-15 h-10' />
                 </div>
 
                 

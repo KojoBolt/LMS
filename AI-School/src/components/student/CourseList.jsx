@@ -11,7 +11,7 @@ const CourseList = () => {
   const [error, setError] = useState(null);
   const scrollRef = useRef(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const coursesPerPage = 3;
+  const coursesPerPage = 4;
   const [user, setUser] = useState(null);
   const [userEnrolledCourseIds, setUserEnrolledCourseIds] = useState([]);
   const navigate = useNavigate();

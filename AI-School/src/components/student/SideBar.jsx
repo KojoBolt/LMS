@@ -5,6 +5,7 @@ import { auth, db } from '../../lib/firebaseConfig';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { doc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
 import { Link } from 'react-router-dom';
+import SideLogo from '../../assets/images/logoblack.png'; // Adjust the path as necessary
 
 const menu = [
     { icon: <Home size={18} />, label: "Home", path: "/student/dashboard" },
@@ -96,9 +97,10 @@ const SideBar = ({ onSearchChange }) => {
     return (
         <div className="bg-[#FAFAFA] fixed border border-r-[#E3E3E3] border-b-0 border-t-0 h-screen w-[300px] p-4 lg:flex flex-col justify-between top-0 left-0 z-50 overflow-x-hidden sm:hidden md:hidden hidden">
             <div>
-                <div className="text-xl font-bold mb-6 m-auto text-center">
-                    <span className="text-black">AI</span>
-                    <span className="text-purple-600"> School </span>
+                <div>
+                    {/* <span className="text-black">AI</span>
+                    <span className="text-purple-600"> School </span> */}
+                    <img src={SideLogo} alt="logo" className='w-24 h-12 m-auto mb-8' />
                 </div>
                 <div>
                     
@@ -129,11 +131,11 @@ const SideBar = ({ onSearchChange }) => {
                 <div className="mb-2">
                     <div className="flex items-center justify-between bg-[#E9E9E9] p-4 mb-9 rounded">
                         <span>Get started</span>
-                        <span className="text-xs font-medium text-purple-600">67%</span>
+                        {/* <span className="text-xs font-medium text-purple-600">67%</span> */}
                     </div>
-                    <div className="w-full h-2 bg-gray-200 rounded mb-10">
-                        <div className="w-[67%] h-full bg-purple-600 rounded" />
-                    </div>
+                    {/* <div className="w-full h-2 bg-gray-200 rounded mb-10">
+                        <div className="w-[100%] h-full bg-black rounded" />
+                    </div> */}
                 </div>
                 <button className="flex mb-10 text-[15px] text-gray-700 hover:underline">
                     <Bug className='mr-1' size={18} />Report a problem

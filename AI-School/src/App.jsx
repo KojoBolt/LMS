@@ -136,6 +136,7 @@ import EditCourse from './components/admin/EditCourse';
 import CreateGuide from './components/admin/CreateGuide';
 import WorkshopForm from './components/admin/WorkshopForm';
 import AdminProfile from './components/admin/AdminProfile';
+import AdminManagement from './components/admin/AdminManagement';
 
 // Layout Components
 import AdminLayout from './components/layouts/AdminLayout'
@@ -203,6 +204,7 @@ const App = () => {
           <Route path="create-guide" element={<CreateGuide />} />
           <Route path="add-workshop" element={<WorkshopForm />} />
           <Route path="profile" element={<AdminProfile />} />
+          <Route path="users" element={<AdminManagement />} />
 
 
 

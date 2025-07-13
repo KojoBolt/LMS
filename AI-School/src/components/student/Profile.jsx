@@ -1,34 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import { auth, db } from '../../lib/firebaseConfig';
-import { 
-    onAuthStateChanged, 
-    updateProfile, 
-    updatePassword, 
-    reauthenticateWithCredential, 
-    EmailAuthProvider 
-} from 'firebase/auth';
+import { auth, db } from '../../lib/firebaseConfig'; 
+import { onAuthStateChanged, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from 'firebase/auth';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 const Profile = () => {
+    // State for user data and form inputs
     const [user, setUser] = useState(null);
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
     
+    // State for profile picture handling
     const [profilePictureFile, setProfilePictureFile] = useState(null);
     const [profilePicturePreview, setProfilePicturePreview] = useState('');
     const [profilePictureName, setProfilePictureName] = useState('No file chosen');
 
+    // State for password change
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
+    // State for UI feedback
     const [loading, setLoading] = useState(true);
     const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState('');
 
+    // --- Fetch User Data ---
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
             if (currentUser) {
@@ -38,6 +37,7 @@ const Profile = () => {
 
                 if (userDocSnap.exists()) {
                     const userData = userDocSnap.data();
+                    // Populate form with existing data
                     setFirstName(userData.firstName || '');
                     setLastName(userData.lastName || '');
                     setEmail(currentUser.email);
@@ -76,7 +76,6 @@ const Profile = () => {
         }
     };
 
-
     const handlePictureChange = (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -94,12 +93,14 @@ const Profile = () => {
         setSuccessMessage('');
 
         try {
-            let newProfilePicUrl = userProfile.profilePicUrl;
+            // --- THIS IS THE FIX ---
+            // It now correctly uses the 'profilePicturePreview' state variable that exists in this component.
+            let newProfilePicUrl = profilePicturePreview; 
             if (profilePictureFile) {
                 newProfilePicUrl = await handleFileUpload(profilePictureFile);
                 if (!newProfilePicUrl) {
                     setIsUpdatingProfile(false);
-                    return; 
+                    return;  
                 }
             }
 
@@ -126,8 +127,7 @@ const Profile = () => {
             setIsUpdatingProfile(false);
         }
     };
-
-   
+    
     const handlePasswordUpdate = async () => {
         if (!user) return setError("You must be logged in.");
         if (newPassword !== confirmPassword) return setError("New passwords do not match.");
@@ -138,11 +138,9 @@ const Profile = () => {
         setSuccessMessage('');
 
         try {
-            
             const credential = EmailAuthProvider.credential(user.email, currentPassword);
             await reauthenticateWithCredential(user, credential);
-
-    
+        
             await updatePassword(user, newPassword);
 
             setSuccessMessage("Password updated successfully!");
@@ -151,14 +149,16 @@ const Profile = () => {
             setConfirmPassword('');
         } catch (err) {
             console.error("Error updating password:", err);
-            setError(err.message); 
+            setError(err.message);  
         } finally {
             setIsUpdatingPassword(false);
         }
     };
 
     if (loading) {
-        return <div className="p-8 ml-[300px]">Loading profile...</div>;
+        return <div className="flex justify-center items-center h-screen">
+            <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+        </div>;
     }
 
     return (

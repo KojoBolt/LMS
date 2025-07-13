@@ -1,6 +1,3 @@
-// functions/index.js
-
-// --- Imports for all functions ---
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
@@ -8,7 +5,7 @@ import { getAuth } from "firebase-admin/auth"; // Added for admin functions
 import { defineString } from "firebase-functions/params";
 import axios from "axios";
 
-// --- Initialize Firebase Services Once at the top ---
+-
 initializeApp();
 const db = getFirestore();
 const adminAuth = getAuth(); // Use a different name to avoid confusion
@@ -17,9 +14,6 @@ const adminAuth = getAuth(); // Use a different name to avoid confusion
 const paystackSecretKey = defineString("PAYSTACK_SECRET");
 
 
-// ========================================================================
-// --- 1. Your Existing, Working Paystack Verification Function ---
-// ========================================================================
 export const verifyPaystackPayment = onCall(async (request) => {
   if (!request.auth) {
     console.error("Authentication failed: User not logged in.");
@@ -48,7 +42,6 @@ export const verifyPaystackPayment = onCall(async (request) => {
       throw new HttpsError("internal", "Payment was not successful with Paystack.");
     }
 
-    // NOTE: The Admin SDK uses .get() on a reference, not a separate getDoc() function.
     const courseRef = db.collection("courses").doc(courseId);
     const courseSnap = await courseRef.get(); 
     if (!courseSnap.exists) {
@@ -101,8 +94,6 @@ export const verifyPaystackPayment = onCall(async (request) => {
     throw new HttpsError("internal", "An unexpected error occurred during verification.");
   }
 });
-
-
 // ========================================================================
 // --- 2. Your New Function to Create an Admin User ---
 // ========================================================================
@@ -165,4 +156,31 @@ export const setInitialAdmin = onCall(async (request) => {
     console.error("Error setting initial admin:", error);
     throw new HttpsError('internal', 'Failed to set admin role.');
   }
+});
+
+export const deleteAdminUser = onCall(async (request) => {
+    if (request.auth?.token.role !== 'admin') {
+        throw new HttpsError('permission-denied', 'Only admins can delete users.');
+    }
+
+    const { uid: uidToDelete } = request.data;
+    const requestingAdminUid = request.auth.uid;
+
+    if (!uidToDelete) {
+        throw new HttpsError('invalid-argument', 'A user ID must be provided to delete.');
+    }
+
+    if (uidToDelete === requestingAdminUid) {
+        throw new HttpsError('permission-denied', 'Admins cannot delete their own accounts.');
+    }
+
+    try {
+        await adminAuth.deleteUser(uidToDelete);
+        const userDocRef = db.collection('users').doc(uidToDelete);
+        await userDocRef.delete();
+        return { success: true, message: `User ${uidToDelete} has been deleted.` };
+    } catch (error) {
+        console.error('Error deleting admin user:', error);
+        throw new HttpsError('internal', `Failed to delete user: ${error.message}`);
+    }
 });

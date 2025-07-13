@@ -62,7 +62,9 @@ const Guides = () => {
     };
 
     if (loading) {
-        return <div className="p-8 lg:ml-[300px]">Loading guides...</div>;
+        return <div className="flex justify-center items-center h-screen">
+                <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+            </div>;
     }
 
     if (error) {

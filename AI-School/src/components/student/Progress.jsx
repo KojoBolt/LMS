@@ -58,7 +58,7 @@ const Progress = () => {
                         }));
                         setEnrolledCourses(coursesData);
                     } else {
-                        setEnrolledCourses([]); // User is logged in but has no enrolled courses
+                        setEnrolledCourses([]);
                     }
                 }
             } catch (err) {
@@ -73,7 +73,11 @@ const Progress = () => {
     }, [user]);
 
     if (loading) {
-        return <div className="ml-[350px] mt-[30px] p-4">Loading your courses...</div>;
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        );
     }
 
     if (error) {
@@ -81,7 +85,7 @@ const Progress = () => {
     }
 
     return (
-        <div className=" ml-[350px] mt-[30px] w-full max-w-7xl px-4">
+        <div className=" lg:ml-[300px] mt-[30px] w-full max-w-7xl px-4 overflow-x-hidden">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex flex-col items-start">
                     <h2 className="font-semibold flex text-4xl p-3">My Learning</h2>
@@ -93,51 +97,74 @@ const Progress = () => {
 
             {enrolledCourses.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-2">
-                    {enrolledCourses.map((course) => {
-                     
-                        const badgeColor = categoryColors[course.courseCategory] || categoryColors.default;
+                    {enrolledCourses.map((item) => {
+                        const badgeColor = categoryColors[item.courseCategory] || categoryColors.default;
 
-                        return (
-                            <Link
-                                to={`/student/courses/${course.id}`}
-                                key={course.id}
-                                className="bg-white rounded-xl block hover:scale-[1.01] transition-transform border border-gray-200"
-                            >
-                                <div className="bg-black text-white p-4 rounded-t-xl relative min-h-[200px]">
-                                    <div className='w-[70%]'>
-                                        <h3 className="text-lg font-semibold mb-2">{course.courseTitle}</h3>
-
-                                    </div>
-                                    <div className="w-[70%]">
-                                        <p className="text-sm mb-6">
-                                            {course.shortDescription.split(' ').length > 20 
-                                                ? course.shortDescription.split(' ').slice(0, 15).join(' ') + '...'
-                                                : course.shortDescription
-                                            }
-                                        </p>
-                                    </div>
-                                    <button className="px-3 py-1 border rounded border-indigo-500 text-white text-sm">
-                                        Continue Course
-                                    </button>
-                                    <div
-                                        // Use the dynamic badgeColor variable here
-                                        className={`absolute top-0 right-0 h-full w-23 ${badgeColor} flex items-center justify-center text-[10px] font-semibold text-center mr-4 max-w-[100px] [clip-path:polygon(0_0,100%_0,100%_90%,50%_100%,0_90%)]`}
-                                    >
-                                        <div className="text-[15px] text-black">{course.courseCategory}</div>
-                                        <div className="mt-[60px] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                                            <img src={badgeImage} alt="badge" className="w-12 h-12" />
+                        // --- THIS IS THE NEW LOGIC ---
+                        // Check the contentType to decide which card to render
+                        if (item.contentType === 'guide' || item.contentType === 'workshop') {
+                            // Render the simpler thumbnail-focused card for Guides and Workshops
+                            return (
+                                <Link
+                                    to={`/student/${item.contentType}s/${item.id}`} // Dynamic link
+                                    key={item.id}
+                                    className="bg-gray-50 rounded-xl block hover:scale-[1.01] transition-transform border border-gray-200 overflow-hidden"
+                                >
+                                    <div className="relative h-48 bg-black">
+                                        <img 
+                                            src={item.courseThumbnail || 'https://placehold.co/400x200/333/fff?text=Media'} 
+                                            alt={item.courseTitle}
+                                            className="w-full h-full object-cover opacity-50"
+                                        />
+                                        <div className="absolute top-2 left-2 bg-white/80 text-black text-xs px-2 py-1 rounded-full font-semibold capitalize">
+                                            {item.contentType}
                                         </div>
                                     </div>
-                                </div>
-                                <div className="bg-gray-50 p-4 rounded-b-xl">
-                                    <div className="text-sm text-black mb-1 bg-[#E3E3E3] p-1 w-[100px] rounded-2xl text-center">
-                                        Course
+                                    <div className="p-4">
+                                        <h3 className="font-semibold text-base mb-1 truncate">{item.courseTitle}</h3>
+                                        <p className="text-xs text-gray-500">{item.courseCategory}</p>
                                     </div>
-                                    <div className="text-sm font-medium">{course.courseTitle}</div>
-                                    <div className="text-xs text-gray-500">{course.courseLevel}</div>
-                                </div>
-                            </Link>
-                        );
+                                </Link>
+                            );
+                        } else {
+                            // Render the original, detailed card for regular Courses
+                            return (
+                                <Link
+                                    to={`/student/courses/${item.id}`}
+                                    key={item.id}
+                                    className="bg-white rounded-xl block hover:scale-[1.01] transition-transform border border-gray-200"
+                                >
+                                    <div className="bg-black text-white p-4 rounded-t-xl relative min-h-[200px]">
+                                        <div className='w-[70%]'>
+                                            <h3 className="text-lg font-semibold mb-2">{item.courseTitle}</h3>
+                                        </div>
+                                        <div className="w-[70%]">
+                                            <p className="text-sm mb-6 h-10 overflow-hidden">
+                                                {item.shortDescription}
+                                            </p>
+                                        </div>
+                                        <button className="px-3 py-1 border rounded border-indigo-500 text-white text-sm">
+                                            Continue Course
+                                        </button>
+                                        <div
+                                            className={`absolute top-0 right-0 h-full w-28 ${badgeColor} flex items-center justify-center text-[10px] font-semibold text-center mr-4 max-w-[100px] [clip-path:polygon(0_0,100%_0,100%_90%,50%_100%,0_90%)]`}
+                                        >
+                                            <div className="text-[15px] text-black">{item.courseCategory}</div>
+                                            <div className="mt-[60px] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                                                <img src={badgeImage} alt="badge" className="w-12 h-12" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="bg-gray-50 p-4 rounded-b-xl">
+                                        <div className="text-sm text-black mb-1 bg-[#E3E3E3] p-1 w-[100px] rounded-2xl text-center">
+                                            Course
+                                        </div>
+                                        <div className="text-sm font-medium">{item.courseTitle}</div>
+                                        <div className="text-xs text-gray-500">{item.courseLevel}</div>
+                                    </div>
+                                </Link>
+                            );
+                        }
                     })}
                 </div>
             ) : (

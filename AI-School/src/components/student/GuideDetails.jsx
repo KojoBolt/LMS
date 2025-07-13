@@ -73,7 +73,9 @@ const GuideDetails = () => {
     }, [guideId]);
 
     if (loading) {
-        return <div className="flex justify-center items-center h-screen lg:ml-[300px]"><p>Loading guide...</p></div>;
+        return <div className="flex justify-center items-center h-screen">
+                <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+            </div>;
     }
 
     if (error) {
@@ -98,7 +100,6 @@ const GuideDetails = () => {
                                 <div key={lesson.id}>
                                     
                                     
-                                    {/* Renders the video for each specific lesson/article if it exists */}
                                     {lesson.videoUrl && (
                                         <div className="bg-black rounded-lg aspect-video my-6 flex items-center justify-center overflow-hidden">
                                             <iframe

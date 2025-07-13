@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import { Link } from 'react-router-dom';
+import Logo from '../assets/images/logoai.png'; 
 
 
 function NavBar() {
@@ -10,7 +11,10 @@ function NavBar() {
   return (
     <div className="flex justify-between items-center px-8 py-4 rounded-2xl text-white mt-2 sticky top-0 z-50 ">
       {/* Logo */}
-      <div className="text-2xl font-extrabold tracking-wide">EDUCATE</div>
+      {/* <div className="text-2xl font-extrabold tracking-wide">EDUCATE</div> */}
+      <div>
+      <img src={Logo} alt="" className='w-30 h-30' />
+      </div>
 
       {/* Navigation Menu */}
       
