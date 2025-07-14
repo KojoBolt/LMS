@@ -13,7 +13,7 @@ const menu = [
     { icon: <BookOpenText size={18} />, label: "Create Guide", path: "/admin/create-guide" },
     { icon: <EthernetPort size={18} />, label: "Add Workshop", path: "/admin/add-workshop" },
     { icon: <UsersRound size={18} />, label: "Users", path: "/admin/users" },
-    { icon: <Gift size={18} />, label: "Perks", path: "/admin/perks" },
+    // { icon: <Gift size={18} />, label: "Perks", path: "/admin/perks" },
 ];
 
 const AdminSideBar = () => {

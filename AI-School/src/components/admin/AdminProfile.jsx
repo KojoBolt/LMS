@@ -180,7 +180,9 @@ const AdminProfile = () => {
     };
 
     if (loading) {
-        return <div className="p-8 ml-[300px]">Loading profile...</div>;
+        return <div className="flex justify-center items-center h-screen">
+                <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+            </div>;
     }
 //     const makeMeAdmin = async () => {
 //     if (!window.confirm("Are you sure you want to set yourself as the initial admin? This should only be done once.")) {
@@ -198,7 +200,7 @@ const AdminProfile = () => {
 // };
 
     return (
-        <div className="lg:max-w-6xl lg:mx-auto p-8 bg-white lg:ml-[300px] w-[100%] overflow-x-hidden">
+        <div className="lg:max-w-6xl lg:mx-auto p-8 bg-white lg:ml-[300px] w-[100%] overflow-x-hidden mt-[60px] lg:mt-0 mb-[60px] lg:mb-0">
             <h1 className="text-3xl font-bold text-gray-900 mb-5 mt-[30px]">Profile</h1>
 
             {error && <div className="my-4 p-3 text-sm text-red-700 bg-red-100 rounded-md">{error}</div>}

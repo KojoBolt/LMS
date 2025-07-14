@@ -531,7 +531,7 @@ const updateLessonContent = (sectionId, lessonId, content) => {
   };
 
   const renderStepIndicator = () => (
-    <div className="flex items-center justify-between mb-8">
+    <div className="lg:flex items-center justify-between mb-8 flex-wrap hidden">
       {steps.map((step, index) => (
         <div key={step.number} className="flex items-center">
           <div className="flex flex-col items-center">
@@ -678,7 +678,7 @@ const updateLessonContent = (sectionId, lessonId, content) => {
             <button className="p-1 text-gray-600 hover:text-gray-800">≡</button>
             <button className="p-1 text-gray-600 hover:text-gray-800">⚲</button>
           </div> */}
-          <div>
+      <div>
     {/* <label className="block text-sm font-medium text-gray-700 mb-2">
         Course Description *
     </label> */}
@@ -766,288 +766,281 @@ const updateLessonContent = (sectionId, lessonId, content) => {
   );
 
   const renderCourseMedia = () => (
-  <div className="space-y-6">
-    <h2 className="text-xl font-semibold text-gray-900">Course Media</h2>
-    <p className="text-sm text-gray-600">Upload or link a course overview video. Lesson-specific videos can be added in the Curriculum section.</p>
+  <div class="space-y-6">
+    <h2 class="text-xl font-semibold text-gray-900">Course Media</h2>
+    <p class="text-sm text-gray-600">Upload or link a course overview video. Lesson-specific videos can be added in the Curriculum section.</p>
 
     {/* Course Thumbnail Upload (Cloudinary) */}
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Course Thumbnail *
-      </label>
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-        <div className="space-y-2">
-          <div className="text-gray-500">{formData.courseThumbnail ? 'Image Uploaded' : 'No File Selected'}</div>
-          <input
-            type="file"
-            accept="image/jpeg,image/png,image/gif,image/webp"
-            onChange={handleThumbnailChange}
-            className="hidden"
-            id="thumbnail-upload"
-          />
-          <label
-            htmlFor="thumbnail-upload"
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 cursor-pointer"
-          >
-            Upload File
-          </label>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+            Course Thumbnail *
+        </label>
+        <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-8 text-center">
+            <div class="space-y-2">
+                <div class="text-gray-500">{formData.courseThumbnail ? 'Image Uploaded' : 'No File Selected'}</div>
+                <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
+                    onChange={handleThumbnailChange}
+                    class="hidden"
+                    id="thumbnail-upload"
+                />
+                <label
+                    htmlFor="thumbnail-upload"
+                    class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 cursor-pointer"
+                >
+                    Upload File
+                </label>
+            </div>
+            <div class="mt-4">
+                <div class="text-orange-500 text-sm">📎 Upload Image</div>
+                <div class="text-xs text-gray-500 mt-1">
+                    JPEG, PNG, GIF, and WebP formats, up to 2 MB
+                </div>
+            </div>
         </div>
-        <div className="mt-4">
-          <div className="text-orange-500 text-sm">📎 Upload Image</div>
-          <div className="text-xs text-gray-500 mt-1">
-            JPEG, PNG, GIF, and WebP formats, up to 2 MB
-          </div>
-        </div>
-      </div>
     </div>
 
     {/* Course Overview Video */}
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Course Overview Video *
-      </label>
-      <div className="flex space-x-4 mb-4">
-        <select
-          value={formData.courseVideoType}
-          onChange={(e) => handleInputChange('courseVideoType', e.target.value)}
-          className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="external">External URL</option>
-          <option value="upload">Upload Video</option>
-        </select>
-        {formData.courseVideoType === 'external' ? (
-          <input
-            type="text"
-            value={formData.courseVideoUrl}
-            onChange={handleVideoUrlChange}
-            placeholder="YouTube, Vimeo, or direct video URL (.mp4, .webm, .ogg)"
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        ) : (
-          <input
-            type="file"
-            accept="video/*"
-            onChange={handleVideoUpload}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        )}
-      </div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">
+            Course Overview Video *
+        </label>
+        <div class="flex flex-col sm:flex-row sm:space-x-4 mb-4">
+            <select
+                value={formData.courseVideoType}
+                onChange={(e) => handleInputChange('courseVideoType', e.target.value)}
+                class="mb-2 sm:mb-0 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+                <option value="external">External URL</option>
+                <option value="upload">Upload Video</option>
+            </select>
+            {formData.courseVideoType === 'external' ? (
+                <input
+                    type="text"
+                    value={formData.courseVideoUrl}
+                    onChange={handleVideoUrlChange}
+                    placeholder="YouTube, Vimeo, or direct video URL"
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+            ) : (
+                <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleVideoUpload}
+                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+            )}
+        </div>
 
-      <div className="relative bg-gray-100 rounded-lg overflow-hidden" style={{ aspectRatio: '16/9' }}>
-        {formData.courseVideoUrl ? (
-          getEmbedUrl(formData.courseVideoUrl)?.includes('youtube.com') ||
-          getEmbedUrl(formData.courseVideoUrl)?.includes('vimeo.com') ? (
-            <iframe
-              src={getEmbedUrl(formData.courseVideoUrl)}
-              className="w-full h-full"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
-              title="Course Video Preview"
-            />
-          ) : (
-            <video
-              src={getEmbedUrl(formData.courseVideoUrl)}
-              controls
-              className="w-full h-full object-cover"
-              poster={formData.courseThumbnail}
-            />
-          )
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-gray-500">
-            No video selected
-          </div>
-        )}
-        {formData.courseVideoUrl && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-16 h-16 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
-              <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1"></div>
-            </div>
-          </div>
-        )}
-      </div>
+        <div class="relative bg-gray-100 rounded-lg overflow-hidden" style={{ aspectRatio: '16/9' }}>
+            {formData.courseVideoUrl ? (
+                getEmbedUrl(formData.courseVideoUrl)?.includes('youtube.com') ||
+                getEmbedUrl(formData.courseVideoUrl)?.includes('vimeo.com') ? (
+                    <iframe
+                        src={getEmbedUrl(formData.courseVideoUrl)}
+                        class="w-full h-full"
+                        allow="autoplay; encrypted-media"
+                        allowFullScreen
+                        title="Course Video Preview"
+                    />
+                ) : (
+                    <video
+                        src={getEmbedUrl(formData.courseVideoUrl)}
+                        controls
+                        class="w-full h-full object-cover"
+                        poster={formData.courseThumbnail}
+                    />
+                )
+            ) : (
+                <div class="w-full h-full flex items-center justify-center text-gray-500 text-center p-4">
+                    No video selected
+                </div>
+            )}
+            {formData.courseVideoUrl && (
+                <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div class="w-16 h-16 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                        <div class="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1"></div>
+                    </div>
+                </div>
+            )}
+        </div>
     </div>
-  </div>
+</div>
 );
 
 const renderCurriculum = () => (
   <div className="space-y-6">
-    <div className="flex justify-between items-center">
-      <h2 className="text-xl font-semibold text-gray-900">Curriculum</h2>
-      <button
-        onClick={addSection}
-        className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center"
-      >
-        <Plus /> Add New Topic
-      </button>
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
+        <h2 className="text-xl font-semibold text-gray-900">Curriculum</h2>
+        <button
+            onClick={addSection}
+            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center justify-center sm:justify-start"
+        >
+            <Plus className="mr-2" /> Add New Topic
+        </button>
     </div>
 
     <div className="space-y-4">
-      {formData.sections.map((section) => (
-        <div key={section.id} className="border border-gray-200 rounded-lg">
-          <div className="flex items-center justify-between p-4 bg-gray-50">
-            <div className="flex items-center space-x-3">
-              <button
-                onClick={() => toggleSection(section.id)}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <FolderOpen />
-              </button>
-              <input
-                type="text"
-                value={section.title}
-                onChange={(e) => updateSectionTitle(section.id, e.target.value)}
-                className="font-medium text-gray-900 bg-transparent border-none focus:outline-none focus:ring-0"
-                placeholder="Enter section title"
-              />
-            </div>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => deleteSection(section.id)}
-                className="text-red-600 hover:text-red-800"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
-
-          {section.expanded && (
-            <div className="p-4 space-y-3">
-              {section.lessons.map((lesson) => (
-                <div
-                  key={lesson.id}
-                  className="p-3 bg-white border border-gray-200 rounded"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center space-x-3">
-                      <CirclePlay />
-                      <input
-                        type="text"
-                        value={lesson.title}
-                        onChange={(e) =>
-                          updateLessonTitle(section.id, lesson.id, e.target.value)
-                        }
-                        className="text-sm text-gray-700 bg-transparent border-none focus:outline-none focus:ring-0"
-                        placeholder="Enter lesson title"
-                      />
+        {formData.sections.map((section) => (
+            <div key={section.id} className="border border-gray-200 rounded-lg">
+                <div className="flex items-center justify-between p-2 sm:p-4 bg-gray-50">
+                    <div className="flex items-center space-x-2 sm:space-x-3">
+                        <button
+                            onClick={() => toggleSection(section.id)}
+                            className="text-gray-500 hover:text-gray-700"
+                        >
+                            <FolderOpen />
+                        </button>
+                        <input
+                            type="text"
+                            value={section.title}
+                            onChange={(e) => updateSectionTitle(section.id, e.target.value)}
+                            className="font-medium text-gray-900 bg-transparent border-none focus:outline-none focus:ring-0 w-full"
+                            placeholder="Enter section title"
+                        />
                     </div>
                     <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => deleteLesson(section.id, lesson.id)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
+                        <button
+                            onClick={() => deleteSection(section.id)}
+                            className="text-red-600 hover:text-red-800"
+                        >
+                            <Trash2 className="w-5 h-5" />
+                        </button>
                     </div>
-                  </div>
-
-                  {/* Lesson Video and Content Inputs */}
-                  <div className="ml-8 space-y-2">
-                    <div className="flex items-center space-x-4">
-                      <label className="text-sm font-medium text-gray-700">
-                        Video Type
-                      </label>
-                      <select
-                        value={lesson.videoType}
-                        onChange={(e) =>
-                          updateLessonVideoType(section.id, lesson.id, e.target.value)
-                        }
-                        className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        <option value="external">External URL</option>
-                        <option value="upload">Upload Video</option>
-                      </select>
-                    </div>
-
-                    {lesson.videoType === 'external' ? (
-                      <input
-                        type="text"
-                        value={lesson.videoUrl}
-                        onChange={(e) =>
-                          updateLessonVideoUrl(section.id, lesson.id, e.target.value)
-                        }
-                        placeholder="YouTube, Vimeo, or direct video URL (.mp4, .webm, .ogg)"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    ) : (
-                      <input
-                        type="file"
-                        accept="video/*"
-                        onChange={(e) =>
-                          handleLessonVideoUpload(section.id, lesson.id, e)
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    )}
-
-                    {/* Video Preview */}
-                    {lesson.videoUrl && (
-                      <div className="relative bg-gray-100 rounded-lg overflow-hidden" style={{ aspectRatio: '16/9' }}>
-                        {getEmbedUrl(lesson.videoUrl)?.includes('youtube.com') ||
-                        getEmbedUrl(lesson.videoUrl)?.includes('vimeo.com') ? (
-                          <iframe
-                            src={getEmbedUrl(lesson.videoUrl)}
-                            className="w-full h-full"
-                            allow="autoplay; encrypted-media"
-                            allowFullScreen
-                            title={`Lesson Video Preview ${lesson.id}`}
-                          />
-                        ) : (
-                          <video
-                            src={getEmbedUrl(lesson.videoUrl)}
-                            controls
-                            className="w-full h-full object-cover"
-                            poster={formData.courseThumbnail}
-                          />
-                        )}
-                        
-                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                          <div className="w-16 h-16 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
-                            <div className="w-0 h-0 border-l-[12px] border-l-white border-t-[8px] border-t-transparent border-b-[8px] border-b-transparent ml-1"></div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                    <div className="mt-4">
-    <label className="block text-sm font-medium text-gray-700 mb-2">
-        Lesson Duration (in minutes)
-    </label>
-    <input
-        type="number"
-        placeholder="e.g., 7"
-        value={lesson.duration || ''} // Display the current duration
-        onChange={(e) => updateLessonDuration(section.id, lesson.id, e.target.value)}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md"
-    />
-</div>
-
-                    {/* Lesson Content Textarea */}
-                    {/* <textarea
-                      value={lesson.content}
-                      onChange={(e) => updateLessonContent(section.id, lesson.id, e.target.value)}
-                      rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter lesson content (e.g., description, notes, or additional resources)"
-                    /> */}
-                     <SlateEditor
-                          key={lesson.id}
-                          initialContent={lesson.content}
-                          onChange={(content) => updateLessonContent(section.id, lesson.id, content)}
-                      />
-                  </div>
                 </div>
-              ))}
-              <button
-                onClick={() => addLesson(section.id)}
-                className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
-              >
-                Add Lesson
-              </button>
+
+                {section.expanded && (
+                    <div className="p-2 sm:p-4 space-y-3">
+                        {section.lessons.map((lesson) => (
+                            <div
+                                key={lesson.id}
+                                className="p-3 bg-white border border-gray-200 rounded"
+                            >
+                                <div className="flex items-center justify-between mb-2">
+                                    <div className="flex items-center space-x-2 sm:space-x-3">
+                                        <CirclePlay />
+                                        <input
+                                            type="text"
+                                            value={lesson.title}
+                                            onChange={(e) =>
+                                                updateLessonTitle(section.id, lesson.id, e.target.value)
+                                            }
+                                            className="text-sm text-gray-700 bg-transparent border-none focus:outline-none focus:ring-0 w-full"
+                                            placeholder="Enter lesson title here"
+                                        />
+                                    </div>
+                                    <div className="flex items-center space-x-2">
+                                        <button
+                                            onClick={() => deleteLesson(section.id, lesson.id)}
+                                            className="text-red-600 hover:text-red-800"
+                                        >
+                                            <Trash2 className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Lesson Video and Content Inputs */}
+                                <div className="ml-0 sm:ml-8 space-y-2">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
+                                        <label className="text-sm font-medium text-gray-700 mb-1 sm:mb-0">
+                                            Video Type
+                                        </label>
+                                        <select
+                                            value={lesson.videoType}
+                                            onChange={(e) =>
+                                                updateLessonVideoType(section.id, lesson.id, e.target.value)
+                                            }
+                                            className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        >
+                                            <option value="external">External URL</option>
+                                            <option value="upload">Upload Video</option>
+                                        </select>
+                                    </div>
+
+                                    {lesson.videoType === 'external' ? (
+                                        <input
+                                            type="text"
+                                            value={lesson.videoUrl}
+                                            onChange={(e) =>
+                                                updateLessonVideoUrl(section.id, lesson.id, e.target.value)
+                                            }
+                                            placeholder="YouTube, Vimeo, or direct video URL"
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    ) : (
+                                        <input
+                                            type="file"
+                                            accept="video/*"
+                                            onChange={(e) =>
+                                                handleLessonVideoUpload(section.id, lesson.id, e)
+                                            }
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        />
+                                    )}
+
+                                    {/* Video Preview */}
+                                    {lesson.videoUrl && (
+                                        <div className="relative bg-gray-100 rounded-lg overflow-hidden" style={{ aspectRatio: '16/9' }}>
+                                            {getEmbedUrl(lesson.videoUrl)?.includes('youtube.com') ||
+                                            getEmbedUrl(lesson.videoUrl)?.includes('vimeo.com') ? (
+                                                <iframe
+                                                    src={getEmbedUrl(lesson.videoUrl)}
+                                                    className="w-full h-full"
+                                                    allow="autoplay; encrypted-media"
+                                                    allowFullScreen
+                                                    title={`Lesson Video Preview ${lesson.id}`}
+                                                />
+                                            ) : (
+                                                <video
+                                                    src={getEmbedUrl(lesson.videoUrl)}
+                                                    controls
+                                                    className="w-full h-full object-cover"
+                                                    poster={formData.courseThumbnail}
+                                                />
+                                            )}
+                                            
+                                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                                                    <div className="w-0 h-0 border-l-[10px] sm:border-l-[12px] border-l-white border-t-[7px] sm:border-t-[8px] border-t-transparent border-b-[7px] sm:border-b-[8px] border-b-transparent ml-1"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="mt-4">
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Lesson Duration (in minutes)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            placeholder="e.g., 7"
+                                            value={lesson.duration || ''} // Display the current duration
+                                            onChange={(e) => updateLessonDuration(section.id, lesson.id, e.target.value)}
+                                            className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                                        />
+                                    </div>
+
+                                    {/* Lesson Content Textarea */}
+                                    <SlateEditor
+                                        key={lesson.id}
+                                        initialContent={lesson.content}
+                                        onChange={(content) => updateLessonContent(section.id, lesson.id, content)}
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                        <button
+                            onClick={() => addLesson(section.id)}
+                            className="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700"
+                        >
+                            Add Lesson
+                        </button>
+                    </div>
+                )}
             </div>
-          )}
-        </div>
-      ))}
+        ))}
     </div>
-  </div>
+</div>
 );
 
   const renderAdditionalInformation = () => (
@@ -1305,8 +1298,8 @@ const renderCurriculum = () => (
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+    <div className="lg:max-w-4xl mx-auto p-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 overflow-x-hidden mt-[65px] lg:mt-0 mb-[65px] lg:mb-0">
         {error && <div className="text-center p-4 text-red-600 mb-4">{error}</div>}
         {renderStepIndicator()}
         {renderCurrentStep()}

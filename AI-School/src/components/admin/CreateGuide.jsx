@@ -211,101 +211,106 @@ const CreateGuide = () => {
     };
 
     const renderStepIndicator = () => (
-        <div className="flex items-center justify-between mb-8">
-            {steps.map((step, index) => (
-                <React.Fragment key={step.number}>
-                    <div className="flex flex-col items-center">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${currentStep === index + 1 ? 'bg-blue-600 text-white' : currentStep > index + 1 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
-                            {currentStep > index + 1 ? '✓' : index + 1}
-                        </div>
-                        <span className="text-xs mt-1 text-gray-600">{step.title}</span>
-                    </div>
-                    {index < steps.length - 1 && (
-                        <div className={`w-24 h-0.5 mx-2 mt-[-16px] ${currentStep > index + 1 ? 'bg-green-500' : 'bg-gray-200'}`} />
-                    )}
-                </React.Fragment>
-            ))}
-        </div>
+    <div className="flex items-start justify-between mb-8">
+    {steps.map((step, index) => (
+        <React.Fragment key={step.number}>
+            <div className="flex flex-col items-center text-center w-12 sm:w-20">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${currentStep === index + 1 ? 'bg-blue-600 text-white' : currentStep > index + 1 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                    {currentStep > index + 1 ? '✓' : index + 1}
+                </div>
+                <span className="text-xs mt-2 text-gray-600">{step.title}</span>
+            </div>
+            {index < steps.length - 1 && (
+                <div className={`flex-1 h-0.5 mt-4 mx-1 sm:mx-2 ${currentStep > index + 1 ? 'bg-green-500' : 'bg-gray-200'}`} />
+            )}
+        </React.Fragment>
+    ))}
+</div>
     );
 
     const renderBasicInfo = () => (
         <div className="space-y-6">
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Guide Title *</label>
-                <input type="text" value={formData.guideTitle} onChange={(e) => handleInputChange('guideTitle', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Enter guide title" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
-                    <select value={formData.guideCategory} onChange={(e) => handleInputChange('guideCategory', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md">
-                        <option value="">Select Category</option>
-                        <option value="Data Analysis">Data Analysis</option>
-                        <option value="Business Operations">Business Operations</option>
-                        <option value="Coding">Coding</option>
-                        <option value="Project Management">Project Management</option>
-                    </select>
-                </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Skill Level *</label>
-                    <select value={formData.guideLevel} onChange={(e) => handleInputChange('guideLevel', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md">
-                        <option value="Beginner">Beginner</option>
-                        <option value="Intermediate">Intermediate</option>
-                        <option value="Advanced">Advanced</option>
-                    </select>
-                </div>
-            </div>
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Short Description *</label>
-                <textarea value={formData.shortDescription} onChange={(e) => handleInputChange('shortDescription', e.target.value)} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Enter a brief summary of the guide" />
-            </div>
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Main Guide Description</label>
-                <SlateEditor value={formData.courseDescription} onChange={(newContent) => handleInputChange('courseDescription', newContent)} />
-            </div>
-            <div>
-                <label className="block text-lg font-semibold text-gray-900 mb-4">Guide Thumbnail *</label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                    {formData.guideThumbnail && (<img src={formData.guideThumbnail} alt="Thumbnail preview" className="w-48 h-auto mx-auto rounded-md mb-4"/>)}
-                    <div className="text-gray-500">{formData.guideThumbnail ? 'Image Uploaded' : 'No File Selected'}</div>
-                    <input type="file" accept="image/*" onChange={handleThumbnailChange} className="hidden" id="thumbnail-upload" />
-                    <label htmlFor="thumbnail-upload" className="bg-blue-600 text-white px-4 py-2 mt-2 inline-block rounded-md hover:bg-blue-700 cursor-pointer">Upload File</label>
-                </div>
-            </div>
-            <div className="pt-6 border-t">
-                <label className="block text-lg font-semibold text-gray-900 mb-4">Guide Overview Video</label>
-                 <div className="flex space-x-4 mb-4">
-                    <select
-                        value={formData.courseVideoType}
-                        onChange={(e) => handleInputChange('courseVideoType', e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        <option value="external">External URL</option>
-                        <option value="upload">Upload Video</option>
-                    </select>
-                    {formData.courseVideoType === 'external' ? (
-                        <input
-                            type="text"
-                            value={formData.courseVideoUrl}
-                            onChange={handleVideoUrlChange}
-                            placeholder="YouTube, Vimeo, or direct video URL"
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
-                        />
-                    ) : (
-                        <input
-                            type="file"
-                            accept="video/*"
-                            onChange={handleVideoUpload}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
-                        />
-                    )}
-                </div>
-                {formData.courseVideoUrl && (
-                     <div className="relative bg-gray-100 rounded-lg overflow-hidden" style={{ aspectRatio: '16/9' }}>
-                        <iframe src={getEmbedUrl(formData.courseVideoUrl)} className="w-full h-full" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen title="Guide Video Preview" />
-                    </div>
-                )}
-            </div>
+    <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Guide Title *</label>
+        <input type="text" value={formData.guideTitle} onChange={(e) => handleInputChange('guideTitle', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Enter guide title" />
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Category *</label>
+            <select value={formData.guideCategory} onChange={(e) => handleInputChange('guideCategory', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md">
+                <option value="">Select Category</option>
+                <option value="Data Analysis">Data Analysis</option>
+                <option value="Business Operations">Business Operations</option>
+                <option value="Coding">Coding</option>
+                <option value="Project Management">Project Management</option>
+            </select>
         </div>
+        <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Skill Level *</label>
+            <select value={formData.guideLevel} onChange={(e) => handleInputChange('guideLevel', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md">
+                <option value="Beginner">Beginner</option>
+                <option value="Intermediate">Intermediate</option>
+                <option value="Advanced">Advanced</option>
+            </select>
+        </div>
+    </div>
+
+    <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Short Description *</label>
+        <textarea value={formData.shortDescription} onChange={(e) => handleInputChange('shortDescription', e.target.value)} rows={3} className="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="Enter a brief summary of the guide" />
+    </div>
+
+    <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Main Guide Description</label>
+        <SlateEditor value={formData.courseDescription} onChange={(newContent) => handleInputChange('courseDescription', newContent)} />
+    </div>
+
+    <div>
+        <label className="block text-lg font-semibold text-gray-900 mb-4">Guide Thumbnail *</label>
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 sm:p-8 text-center">
+            {formData.guideThumbnail && (<img src={formData.guideThumbnail} alt="Thumbnail preview" className="w-48 h-auto mx-auto rounded-md mb-4"/>)}
+            <div className="text-gray-500">{formData.guideThumbnail ? 'Image Uploaded' : 'No File Selected'}</div>
+            <input type="file" accept="image/*" onChange={handleThumbnailChange} className="hidden" id="thumbnail-upload" />
+            <label htmlFor="thumbnail-upload" className="bg-blue-600 text-white px-4 py-2 mt-2 inline-block rounded-md hover:bg-blue-700 cursor-pointer">Upload File</label>
+        </div>
+    </div>
+
+    <div className="pt-6 border-t">
+        <label className="block text-lg font-semibold text-gray-900 mb-4">Guide Overview Video</label>
+        <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mb-4">
+            <select
+                value={formData.courseVideoType}
+                onChange={(e) => handleInputChange('courseVideoType', e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+                <option value="external">External URL</option>
+                <option value="upload">Upload Video</option>
+            </select>
+            {formData.courseVideoType === 'external' ? (
+                <input
+                    type="text"
+                    value={formData.courseVideoUrl}
+                    onChange={handleVideoUrlChange}
+                    placeholder="YouTube, Vimeo, or direct video URL"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                />
+            ) : (
+                <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleVideoUpload}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                />
+            )}
+        </div>
+        {formData.courseVideoUrl && (
+            <div className="relative bg-gray-100 rounded-lg overflow-hidden" style={{ aspectRatio: '16/9' }}>
+                <iframe src={getEmbedUrl(formData.courseVideoUrl)} className="w-full h-full" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen title="Guide Video Preview" />
+            </div>
+        )}
+    </div>
+</div>
     );
 
     const renderContent = () => (
@@ -397,25 +402,24 @@ const CreateGuide = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-                {renderStepIndicator()}
-                {error && <div className="text-center p-4 text-red-600 bg-red-50 rounded-lg mb-6">{error}</div>}
-                <div className="mt-8">
-                    {renderCurrentStep()}
-                </div>
-                <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
-                    <button onClick={handlePrevious} disabled={currentStep === 1} className="flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50">
-                        <ChevronLeft className="w-4 h-4 mr-1" /> Previous
-                    </button>
-                    <button onClick={handleNext} disabled={isSubmitting} className="flex items-center px-6 py-2 bg-red-500 text-white text-sm font-medium rounded-md hover:bg-red-600 disabled:bg-gray-400">
-                        {isSubmitting ? 'Submitting...' : (currentStep === totalSteps ? 'Submit Guide' : 'Next')}
-                        {currentStep < totalSteps && <ChevronRight className="w-4 h-4 ml-1" />}
-                    </button>
-                </div>
-            </div>
+       <div className="max-w-4xl mx-auto p-2 sm:p-4 md:p-6 mb-[65px] mt-[65px]">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8  overflow-x-hidden">
+        {renderStepIndicator()}
+        {error && <div className="text-center p-4 text-red-600 bg-red-50 rounded-lg mb-6">{error}</div>}
+        <div className="mt-8">
+            {renderCurrentStep()}
         </div>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mt-8 pt-6 border-t border-gray-200 space-y-2 sm:space-y-0">
+            <button onClick={handlePrevious} disabled={currentStep === 1} className="flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50">
+                <ChevronLeft className="w-4 h-4 mr-1" /> Previous
+            </button>
+            <button onClick={handleNext} disabled={isSubmitting} className="flex items-center justify-center px-6 py-2 bg-red-500 text-white text-sm font-medium rounded-md hover:bg-red-600 disabled:bg-gray-400">
+                {isSubmitting ? 'Submitting...' : (currentStep === totalSteps ? 'Submit Guide' : 'Next')}
+                {currentStep < totalSteps && <ChevronRight className="w-4 h-4 ml-1" />}
+            </button>
+        </div>
+    </div>
+</div>
     );
 };
-
 export default CreateGuide;

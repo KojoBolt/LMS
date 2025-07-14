@@ -1,6 +1,7 @@
 import React from 'react';
 import { Search, Bell, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import AdminLogo from '../../assets/images/logoblack.png';
 
 const AdminMobileHeader = () => {
   return (
@@ -8,17 +9,16 @@ const AdminMobileHeader = () => {
       <div className="flex justify-between items-center">
         {/* Logo */}
         <div className="text-xl font-bold">
-          <span className="text-gray-800">AI-Skul</span>
-          <span className="text-purple-600"> Admin</span>
+          <img src={AdminLogo} alt="Ai-School" className='w-20 h-11'/>
         </div>
 
         {/* Icons */}
         <div className="flex items-center space-x-4">
-          <Search size={22} className="text-gray-600" />
-          <div className="relative">
+          {/* <Search size={22} className="text-gray-600" /> */}
+          {/* <div className="relative">
             <Bell size={22} className="text-gray-600" />
             <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
-          </div>
+          </div> */}
           <Link to="/admin/profile">
             <User size={22} className="text-gray-600" />
           </Link>

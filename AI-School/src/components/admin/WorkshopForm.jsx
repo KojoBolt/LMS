@@ -173,21 +173,21 @@ const WorkshopForm = () => {
 
     // --- Render Functions for Steps ---
     const renderStepIndicator = () => (
-        <div className="flex items-center justify-between mb-8">
+    <div className="flex items-start justify-between mb-8">
             {steps.map((step, index) => (
                 <React.Fragment key={step.number}>
-                    <div className="flex flex-col items-center">
+                    <div className="flex flex-col items-center text-center w-12 sm:w-20">
                         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${currentStep === index + 1 ? 'bg-blue-600 text-white' : currentStep > index + 1 ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-600'}`}>
                             {currentStep > index + 1 ? '✓' : index + 1}
                         </div>
-                        <span className="text-xs mt-1 text-gray-600">{step.title}</span>
+                        <span className="text-xs mt-2 text-gray-600">{step.title}</span>
                     </div>
                     {index < steps.length - 1 && (
-                        <div className={`w-24 h-0.5 mx-2 mt-[-16px] ${currentStep > index + 1 ? 'bg-green-500' : 'bg-gray-200'}`} />
+                        <div className={`flex-1 h-0.5 mt-4 mx-1 sm:mx-2 ${currentStep > index + 1 ? 'bg-green-500' : 'bg-gray-200'}`} />
                     )}
                 </React.Fragment>
             ))}
-        </div>
+    </div>
     );
 
     const renderBasicInfo = () => (
@@ -320,24 +320,24 @@ const WorkshopForm = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-6">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-                {renderStepIndicator()}
-                {error && <div className="text-center p-4 text-red-600 bg-red-50 rounded-lg mb-6">{error}</div>}
-                <div className="mt-8">
-                    {renderCurrentStep()}
-                </div>
-                <div className="flex justify-between items-center mt-8 pt-6 border-t border-gray-200">
-                    <button onClick={handlePrevious} disabled={currentStep === 1} className="flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50">
-                        <ChevronLeft className="w-4 h-4 mr-1" /> Previous
-                    </button>
-                    <button onClick={handleNext} disabled={isSubmitting} className="flex items-center px-6 py-2 bg-red-500 text-white text-sm font-medium rounded-md hover:bg-red-600 disabled:bg-gray-400">
-                        {isSubmitting ? 'Submitting...' : (currentStep === totalSteps ? 'Submit Workshop' : 'Next')}
-                        {currentStep < totalSteps && <ChevronRight className="w-4 h-4 ml-1" />}
-                    </button>
-                </div>
-            </div>
+    <div className="max-w-4xl mx-auto p-2 sm:p-4 md:p-6 mt-[65px] lg:mt-0 mb-[65px] lg:mb-0">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 md:p-8">
+        {renderStepIndicator()}
+        {error && <div className="text-center p-4 text-red-600 bg-red-50 rounded-lg mb-6">{error}</div>}
+        <div className="mt-8">
+            {renderCurrentStep()}
         </div>
+        <div className="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center mt-8 pt-6 border-t border-gray-200 space-y-2 sm:space-y-0">
+            <button onClick={handlePrevious} disabled={currentStep === 1} className="flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50">
+                <ChevronLeft className="w-4 h-4 mr-1" /> Previous
+            </button>
+            <button onClick={handleNext} disabled={isSubmitting} className="flex items-center justify-center px-6 py-2 bg-red-500 text-white text-sm font-medium rounded-md hover:bg-red-600 disabled:bg-gray-400">
+                {isSubmitting ? 'Submitting...' : (currentStep === totalSteps ? 'Submit Workshop' : 'Next')}
+                {currentStep < totalSteps && <ChevronRight className="w-4 h-4 ml-1" />}
+            </button>
+        </div>
+    </div>
+</div>
     );
 };
 

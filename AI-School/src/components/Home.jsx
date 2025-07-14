@@ -1,5 +1,7 @@
 import React from "react";
 import NavBar from "./NavBar";
+import { useNavigate } from 'react-router-dom';
+
 
 
 const programs = [
@@ -61,6 +63,8 @@ const programs = [
 ];
 
 const Home = () => {
+    const navigate = useNavigate();
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gradient-to-bl from-black to-[#002786] text-white">
       <div className="fixed top-0 w-full z-50 ">
@@ -75,7 +79,10 @@ const Home = () => {
         <p className="text-lg text-gray-400 mb-8 max-w-md">
           Practical education that gives you all the tools you need to thrive in the digital age.
         </p>
-        <button className="bg-white text-black px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 transition">
+        <button 
+        className="bg-white text-black px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 transition cursor-pointer"
+        onClick={() => navigate('/programs')}
+        >
           SEE ALL PROGRAMS
         </button>
       </div>
