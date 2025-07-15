@@ -1,70 +1,22 @@
-// import React from 'react'
-// import { Navigate } from 'react-router-dom'
+import React from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
 
-// const ProtectedRoute = ({ children, role }) => {
-//   const user = JSON.parse(localStorage.getItem('user') || '{}')
-//   const isAuthenticated = user.token
-//   const userRole = user.role
+const ProtectedRoute = ({ allowedRoles }) => {
+  const userString = localStorage.getItem('userData');
+  const user = JSON.parse(userString || '{}');
 
-//   if (!isAuthenticated) {
-//     return <Navigate to="/auth/login" replace />
-//   }
+  const isAuthenticated = user && user.uid;
+  const userRole = user.role;
 
-//   if (role && userRole !== role) {
-//     return <Navigate to="/" replace />
-//   }
-
-//   return children
-// }
-
-// export default ProtectedRoute
-
-import React from 'react'
-
-// function ProtectedRoute() {
-//   return (
-//     <div>ProtectedRoute</div>
-//   )
-// }
-
-// export default ProtectedRoute
-
-// components/ProtectedRoute.jsx
-import React, { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-import { account, databases, Query } from "../lib/appwriteConfig";
-
-const ProtectedRoute = ({ children, role: requiredRole }) => {
-  const [userRole, setUserRole] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const checkRole = async () => {
-      try {
-        const session = await account.get();
-        const res = await databases.listDocuments(
-          import.meta.env.VITE_APPWRITE_DB_ID,
-          import.meta.env.VITE_APPWRITE_USERS_COLLECTION_ID,
-          [Query.equal("email", session.email)]
-        );
-        setUserRole(res.documents[0]?.role || "student");
-      } catch (err) {
-        setUserRole(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    checkRole();
-  }, []);
-
-  if (loading) return <p>Loading...</p>;
-
-  if (userRole === requiredRole) {
-    return children;
-  } else {
-    return <Navigate to="/unauthorized" />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
+  
+  if (!allowedRoles.includes(userRole)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
 };
 
 export default ProtectedRoute;
