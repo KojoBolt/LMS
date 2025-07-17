@@ -73,7 +73,7 @@ const Home = () => {
   
       {/* LEFT */}
       <div className="relative z-10 w-full md:w-1/2 flex flex-col justify-center items-start p-10 mt-[300px] md:mt-0 lg:mt-0 2xl:mt-0">
-        <h1 className="text-4xl lg:text-6xl md:mt-[250px] md:grid md:grid-cols-1 font-bold leading-tight mt-[150px] mb-6 ">
+        <h1 className="text-4xl lg:text-6xl md:mt-[250px] md:grid md:grid-cols-1 font-bold leading-tight lg:mt-[150px] mb-6 ">
           We’re Changing <br /> The Education System Forever.
         </h1>
         <p className="text-lg text-gray-400 mb-8 max-w-md">

@@ -64,7 +64,7 @@ const Programs = () => {
   return (
     <div className="min-h-screen bg-gradient-to-bl from-black to-[#000648] px-3 py-3 text-white">
         <NavBar/>
-        <div className="bg-[#161616] p-4 rounded-[12px] w-[30%] md:w-[20%] lg:w-[10%]  flex items-center m-auto mb-4 border-6 border-[#242424] ">
+        <div className="bg-[#161616] p-4 rounded-[12px] w-[40%] md:w-[20%] lg:w-[10%]  flex items-center m-auto mb-4 border-6 border-[#242424] ">
           <h1 className=" m-auto font-bold text-center">Our Programs</h1>
         </div>
 

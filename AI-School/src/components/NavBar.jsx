@@ -15,11 +15,11 @@ function NavBar() {
   };
 
   return (
-    <div className="flex justify-between items-center px-8 py-4 rounded-2xl text-white mt-2 sticky top-0 z-50 ">
+    <div className="flex justify-between items-center px-8 py-4 rounded-2xl text-white lg:mt-2 sticky top-0 z-50 ">
       {/* Logo */}
       <div>
         <Link to={"/"}>
-          <img src={Logo} alt="Logo" className='w-30 h-30' />
+          <img src={Logo} alt="Logo" className='w-20 h-12' />
         </Link>
       </div>
 

@@ -97,54 +97,55 @@ const AdminManagement = () => {
     }
 
     return (
-        <div className="lg:max-w-6xl lg:mx-auto p-8 bg-white lg:ml-[300px] w-full mt-[60px]">
-            <div className="flex justify-between items-center mb-8">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Admin Management</h1>
-                    <p className="mt-1 text-sm text-gray-600">View and manage administrator accounts.</p>
-                </div>
-                <button 
-                    onClick={() => navigate('/admin/profile')}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2"
-                >
-                    <UserPlus size={18} />
-                    Add New Admin
-                </button>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 ">
-                <div className="divide-y divide-gray-200">
-                    {admins.map((admin) => (
-                        <div key={admin.id} className="flex items-center justify-between p-4 hover:bg-gray-50">
-                            <div className="flex items-center gap-4">
-                                <img
-                                    src={admin.profilePicUrl || `https://ui-avatars.com/api/?name=${admin.name}&background=random&color=fff`}
-                                    alt={admin.name}
-                                    className="w-12 h-12 rounded-full object-cover"
-                                />
-                                <div>
-                                    <p className="font-semibold text-gray-900">{admin.name}</p>
-                                    <p className="text-sm text-gray-500">{admin.email}</p>
-                                </div>
-                                {auth.currentUser?.uid === admin.id && (
-                                     <span className="text-xs bg-green-100 text-green-800 font-medium px-2 py-1 rounded-full flex items-center gap-1">
-                                        <ShieldCheck size={14} /> You
-                                     </span>
-                                )}
-                            </div>
-                            <button 
-                                onClick={() => handleDeleteAdmin(admin.id, admin.name)}
-                                disabled={auth.currentUser?.uid === admin.id}
-                                className="text-red-500 hover:text-red-700 disabled:text-gray-400 disabled:cursor-not-allowed"
-                                title={auth.currentUser?.uid === admin.id ? "Cannot delete yourself" : "Delete Admin"}
-                            >
-                                <Trash2 size={20} />
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            </div>
+        <div className="lg:max-w-6xl lg:mx-auto p-4 sm:p-6 lg:p-8 bg-white w-full mt-[30px] lg:ml-[300px]">
+    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-4">
+        <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Admin Management</h1>
+            <p className="mt-1 text-sm text-gray-600">View and manage administrator accounts.</p>
         </div>
+        <button 
+            onClick={() => navigate('/admin/profile')}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2 w-full sm:w-auto justify-center"
+        >
+            <UserPlus size={18} />
+            Add New Admin
+        </button>
+    </div>
+
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="divide-y divide-gray-200">
+            {admins.map((admin) => (
+                <div key={admin.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 gap-4 hover:bg-gray-50">
+                    <div className="flex items-center gap-4">
+                        <img
+                            src={admin.profilePicUrl || `https://ui-avatars.com/api/?name=${admin.name}&background=random&color=fff`}
+                            alt={admin.name}
+                            className="w-12 h-12 rounded-full object-cover"
+                        />
+                        <div>
+                            <p className="font-semibold text-gray-900">{admin.name}</p>
+                            <p className="text-sm text-gray-500">{admin.email}</p>
+                        </div>
+                        {auth.currentUser?.uid === admin.id && (
+                            <span className="text-xs bg-green-100 text-green-800 font-medium px-2 py-1 rounded-full flex items-center gap-1">
+                                <ShieldCheck size={14} /> You
+                            </span>
+                        )}
+                    </div>
+                    <button 
+                        onClick={() => handleDeleteAdmin(admin.id, admin.name)}
+                        disabled={auth.currentUser?.uid === admin.id}
+                        className="text-red-500 hover:text-red-700 disabled:text-gray-400 disabled:cursor-not-allowed self-start sm:self-auto"
+                        title={auth.currentUser?.uid === admin.id ? "Cannot delete yourself" : "Delete Admin"}
+                    >
+                        <Trash2 size={20} />
+                    </button>
+                </div>
+            ))}
+        </div>
+    </div>
+</div>
+
     );
 };
 

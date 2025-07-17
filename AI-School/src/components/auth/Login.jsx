@@ -186,7 +186,7 @@ const Login = () => {
                                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
                                 style={{ top: '24px' }}
                             >
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} className="mb-3"/>}
+                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} className="mb-[20px]"/>}
                             </button>
                             <p className="text-xs text-gray-500 mt-1">
                                 Enter, your correct email address and password

@@ -222,150 +222,150 @@ const CourseDetails = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 lg:ml-[300px] sm:mt-[60px] mt-[60px] lg:mt-0">
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="mb-8">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-2">{course.courseTitle}</h1>
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+        <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">{course.courseTitle}</h1>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+            <div className="lg:col-span-2">
+                <div className="bg-black rounded-lg aspect-video mb-4 sm:mb-6 flex items-center justify-center overflow-hidden">
+                    {/* Video player remains the same */}
+                    {currentLesson && currentLesson.videoUrl ? (
+                        <iframe
+                            key={currentLesson.id} 
+                            src={getEmbedUrl(currentLesson.videoUrl)}
+                            className="w-full h-full"
+                            allow="autoplay; encrypted-media; picture-in-picture"
+                            allowFullScreen
+                            title={currentLesson.title || "Course Video"}
+                        ></iframe>
+                    ) : (
+                        <div className="text-white text-lg sm:text-xl flex items-center justify-center h-full">
+                            No Video Available
+                        </div>
+                    )}
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2">
-                        <div className="bg-black rounded-lg aspect-video mb-6 flex items-center justify-center overflow-hidden">
-                            {/* Video player remains the same */}
-                             {currentLesson && currentLesson.videoUrl ? (
-                                <iframe
-                                    key={currentLesson.id} 
-                                    src={getEmbedUrl(currentLesson.videoUrl)}
-                                    className="w-full h-full"
-                                    allow="autoplay; encrypted-media; picture-in-picture"
-                                    allowFullScreen
-                                    title={currentLesson.title || "Course Video"}
-                                ></iframe>
-                            ) : (
-                                <div className="text-white text-xl flex items-center justify-center h-full">
-                                    No Video Available
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="bg-white rounded-lg p-6 mb-6  border border-gray-400">
-                            <div className="flex items-center gap-3 mb-4">
-                                <GraduationCap className="w-6 h-6 text-gray-600" />
-                                <h2 className="text-2xl font-semibold text-gray-900">
-                                    {currentLesson ? currentLesson.title : 'No lesson selected'}
-                                </h2>
-                            </div>
-                            
-                            <div className="text-gray-700 text-lg leading-relaxed mb-6 prose max-w-none ">
-                                {/* SlateViewer remains the same */}
-                                {currentLesson?.content ? (
-                                    <SlateViewer
-                                        key={currentLesson.id} 
-                                        value={currentLesson.content}
-                                        className="prose prose-lg max-w-none"
-                                    />
-                                ) : (
-                                    <p>{course.shortDescription}</p> 
-                                )}
-                            </div>
-
-                            {/* MODIFIED: Navigation buttons now include a Mark as Complete button */}
-                            <div className="flex flex-wrap justify-center sm:justify-between items-center gap-4">
-                                <button
-                                    onClick={goToPreviousLesson}
-                                    disabled={isFirstLesson}
-                                    className="flex items-center gap-2 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <ChevronLeft className="w-4 h-4" />
-                                    Previous
-                                </button>
-                                
-                                {currentLesson && (
-                                     <button
-                                        onClick={handleToggleComplete}
-                                        className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors ${
-                                            isCurrentLessonCompleted 
-                                            ? 'bg-green-100 text-green-800 hover:bg-green-200' 
-                                            : 'bg-blue-500 text-white hover:bg-blue-600'
-                                        }`}
-                                    >
-                                        <CheckCircle className="w-5 h-5" />
-                                        {isCurrentLessonCompleted ? 'Mark as Incomplete' : 'Mark as Complete'}
-                                    </button>
-                                )}
-
-                                <button
-                                    onClick={goToNextLesson}
-                                    disabled={isLastLesson}
-                                    className="flex items-center gap-2 px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    Next Lesson
-                                    <ChevronRight className="w-4 h-4" />
-                                </button>
-                            </div>
-                        </div>
+                <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 mb-4 sm:mb-6 border border-gray-400">
+                    <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+                        <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
+                        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900">
+                            {currentLesson ? currentLesson.title : 'No lesson selected'}
+                        </h2>
+                    </div>
+                    
+                    <div className="text-gray-700 text-base sm:text-lg leading-relaxed mb-4 sm:mb-6 prose max-w-none">
+                        {/* SlateViewer remains the same */}
+                        {currentLesson?.content ? (
+                            <SlateViewer
+                                key={currentLesson.id} 
+                                value={currentLesson.content}
+                                className="prose prose-lg max-w-none"
+                            />
+                        ) : (
+                            <p>{course.shortDescription}</p> 
+                        )}
                     </div>
 
-                    <div className="lg:col-span-1">
-                        {/* DYNAMIC: Progress bar UI now uses dynamic values */}
-                        <div className="bg-white rounded-lg p-6 mb-6 border border-gray-400">
-                            <div className="flex justify-between items-center mb-3">
-                                <h3 className="text-lg font-semibold text-gray-900">Course Progress</h3>
-                                <span className="text-sm text-gray-500">{Math.round(progressPercentage)}% Complete</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div className="bg-black h-2 rounded-full" style={{ width: `${progressPercentage}%` }}></div>
-                            </div>
-                        </div>
+                    {/* MODIFIED: Navigation buttons now include a Mark as Complete button */}
+                    <div className="flex flex-col sm:flex-row sm:flex-wrap justify-center sm:justify-between items-center gap-3 sm:gap-4">
+                        <button
+                            onClick={goToPreviousLesson}
+                            disabled={isFirstLesson}
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                        >
+                            <ChevronLeft className="w-4 h-4" />
+                            Previous
+                        </button>
+                        
+                        {currentLesson && (
+                            <button
+                                onClick={handleToggleComplete}
+                                className={`w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg font-semibold transition-colors text-sm sm:text-base ${
+                                    isCurrentLessonCompleted 
+                                    ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                                    : 'bg-blue-500 text-white hover:bg-blue-600'
+                                }`}
+                            >
+                                <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                                {isCurrentLessonCompleted ? 'Mark as Incomplete' : 'Mark as Complete'}
+                            </button>
+                        )}
 
-                        <div className="bg-white rounded-lg p-6 border border-gray-400 mb-16 lg:mb-0">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Course Content</h3>
-                            
-                            <div className="space-y-4">
-                                {course.sections && course.sections.map((section, secIndex) => (
-                                    <div key={section.id || secIndex}>
-                                        <h4 className="font-bold text-gray-800 mb-2">{section.title}</h4>
-                                        <div className="space-y-2">
-                                            {section.lessons && section.lessons.map((lesson, lesIndex) => {
-                                                // DYNAMIC: Check if the lesson is completed
-                                                const isCompleted = completedLessons.has(lesson.id);
-                                                return (
-                                                    <div
-                                                        key={lesson.id}
-                                                        className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                                                            secIndex === currentSectionIndex && lesIndex === currentLessonIndex
-                                                                ? 'bg-blue-50 border border-blue-200'
-                                                                : 'hover:bg-gray-50'
-                                                        }`}
-                                                        onClick={() => {
-                                                            setCurrentSectionIndex(secIndex);
-                                                            setCurrentLessonIndex(lesIndex);
-                                                        }}
-                                                    >
-                                                        {/* NEW: Display a checkmark icon for completed lessons */}
-                                                        {isCompleted ? (
-                                                            <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                                                        ) : (
-                                                            <div className="text-sm font-medium bg-gray-100 text-gray-600 rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
-                                                                {lesIndex + 1}
-                                                            </div>
-                                                        )}
-                                                        <span className={`flex-1 text-sm ${
-                                                            secIndex === currentSectionIndex && lesIndex === currentLessonIndex ? 'font-medium text-blue-900' : 'text-gray-700'
-                                                        } ${isCompleted ? 'text-gray-500' : ''}`}>
-                                                            {lesson.title}
-                                                        </span>
+                        <button
+                            onClick={goToNextLesson}
+                            disabled={isLastLesson}
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+                        >
+                            Next Lesson
+                            <ChevronRight className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div className="lg:col-span-1">
+                {/* DYNAMIC: Progress bar UI now uses dynamic values */}
+                <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 mb-4 sm:mb-6 border border-gray-400">
+                    <div className="flex justify-between items-center mb-3">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900">Course Progress</h3>
+                        <span className="text-xs sm:text-sm text-gray-500">{Math.round(progressPercentage)}% Complete</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-black h-2 rounded-full" style={{ width: `${progressPercentage}%` }}></div>
+                    </div>
+                </div>
+
+                <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 border border-gray-400 mb-16 lg:mb-0">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Course Content</h3>
+                    
+                    <div className="space-y-3 sm:space-y-4">
+                        {course.sections && course.sections.map((section, secIndex) => (
+                            <div key={section.id || secIndex}>
+                                <h4 className="font-bold text-gray-800 mb-2 text-sm sm:text-base">{section.title}</h4>
+                                <div className="space-y-2">
+                                    {section.lessons && section.lessons.map((lesson, lesIndex) => {
+                                        // DYNAMIC: Check if the lesson is completed
+                                        const isCompleted = completedLessons.has(lesson.id);
+                                        return (
+                                            <div
+                                                key={lesson.id}
+                                                className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg cursor-pointer transition-colors ${
+                                                    secIndex === currentSectionIndex && lesIndex === currentLessonIndex
+                                                        ? 'bg-blue-50 border border-blue-200'
+                                                        : 'hover:bg-gray-50'
+                                                }`}
+                                                onClick={() => {
+                                                    setCurrentSectionIndex(secIndex);
+                                                    setCurrentLessonIndex(lesIndex);
+                                                }}
+                                            >
+                                                {/* NEW: Display a checkmark icon for completed lessons */}
+                                                {isCompleted ? (
+                                                    <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-green-500 flex-shrink-0" />
+                                                ) : (
+                                                    <div className="text-xs sm:text-sm font-medium bg-gray-100 text-gray-600 rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center flex-shrink-0">
+                                                        {lesIndex + 1}
                                                     </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                ))}
+                                                )}
+                                                <span className={`flex-1 text-xs sm:text-sm ${
+                                                    secIndex === currentSectionIndex && lesIndex === currentLessonIndex ? 'font-medium text-blue-900' : 'text-gray-700'
+                                                } ${isCompleted ? 'text-gray-500' : ''}`}>
+                                                    {lesson.title}
+                                                </span>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
                             </div>
-                        </div>
+                        ))}
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
     );
 };
 

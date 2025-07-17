@@ -81,80 +81,79 @@ const WorkshopDetails = () => {
 
     return (
         <div className="min-h-screen bg-white lg:ml-[300px] mt-[60px] lg:mt-0 mb-[60px] lg:mb-0">
-            <div className="max-w-7xl mx-auto px-4 py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-                    {/* Main Content Area */}
-                    <div className="lg:col-span-2">
-                        <div className="mb-8">
-                             <span className="inline-block bg-purple-100 text-purple-800 text-sm font-medium px-3 py-1 rounded-full mb-4">
-                                {workshop.courseCategory}
-                            </span>
-                            <h1 className="text-4xl font-bold text-gray-900 p-4">{workshop.courseTitle}</h1>
-                            <p className="text-lg text-gray-600 mt-2">{workshop.shortDescription}</p>
-                        </div>
-                        
-                        
-                        {/* Workshop Sessions/Lessons */}
-                        <div className="space-y-10">
-                            {workshop.sections && workshop.sections[0]?.lessons.map((lesson, index) => (
-                                <div key={lesson.id || index} className="pt-6 border-t first:border-t-0 first:pt-0">
-                                    
-                                    {lesson.videoUrl && (
-                                        <div className="bg-gray-200 rounded-lg aspect-video my-6 flex items-center justify-center overflow-hidden">
-                                            <iframe
-                                                src={getEmbedUrl(lesson.videoUrl)}
-                                                className="w-full h-full"
-                                                allow="autoplay; encrypted-media; picture-in-picture"
-                                                allowFullScreen
-                                                title={lesson.title}
-                                            ></iframe>
-                                        </div>
-                                    )}
-
-                                    <div className="prose max-w-none text-gray-700 bg-gray-50 p-6 rounded-lg border border-gray-200">
-                                        <h3 className="text-2xl font-semibold text-gray-800 mb-4">{lesson.title}</h3>
-                                        <SlateViewer value={lesson.content} />
-                                    </div>
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-12">
+            {/* Main Content Area */}
+            <div className="lg:col-span-2">
+                <div className="mb-6 sm:mb-8">
+                    <span className="inline-block bg-purple-100 text-purple-800 text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded-full mb-3 sm:mb-4">
+                        {workshop.courseCategory}
+                    </span>
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 p-2 sm:p-3 md:p-4">{workshop.courseTitle}</h1>
+                    <p className="text-base sm:text-lg text-gray-600 mt-2">{workshop.shortDescription}</p>
+                </div>
+                
+                {/* Workshop Sessions/Lessons */}
+                <div className="space-y-6 sm:space-y-8 md:space-y-10">
+                    {workshop.sections && workshop.sections[0]?.lessons.map((lesson, index) => (
+                        <div key={lesson.id || index} className="pt-4 sm:pt-6 border-t first:border-t-0 first:pt-0">
+                            
+                            {lesson.videoUrl && (
+                                <div className="bg-gray-200 rounded-lg aspect-video my-4 sm:my-6 flex items-center justify-center overflow-hidden">
+                                    <iframe
+                                        src={getEmbedUrl(lesson.videoUrl)}
+                                        className="w-full h-full"
+                                        allow="autoplay; encrypted-media; picture-in-picture"
+                                        allowFullScreen
+                                        title={lesson.title}
+                                    ></iframe>
                                 </div>
-                            ))}
+                            )}
+
+                            <div className="prose max-w-none text-gray-700 bg-gray-50 p-4 sm:p-5 md:p-6 rounded-lg border border-gray-200">
+                                <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 sm:mb-4">{lesson.title}</h3>
+                                <SlateViewer value={lesson.content} />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+                <div className="bg-gray-50 rounded-lg p-4 sm:p-5 md:p-6 lg:sticky lg:top-8 border border-gray-200">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Hosted by</h3>
+                    <div className="flex items-center gap-3 sm:gap-4 mb-4 sm:mb-6">
+                        <img 
+                            src={host?.profilePicUrl || `https://ui-avatars.com/api/?name=${host?.name || 'A'}&background=random&color=fff`} 
+                            alt={host?.name || 'Host'}
+                            className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full object-cover shadow-md"
+                        />
+                        <div>
+                            <p className="font-bold text-base sm:text-lg">{host?.name || 'AI-School Team'}</p>
+                            <p className="text-xs sm:text-sm text-gray-600">{host?.role || 'Instructor'}</p>
                         </div>
                     </div>
 
-                    {/* Sidebar */}
-                    <div className="lg:col-span-1">
-                        <div className="bg-gray-50 rounded-lg p-6 sticky top-8 border border-gray-200">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Hosted by</h3>
-                            <div className="flex items-center gap-4 mb-6">
-                                <img 
-                                    src={host?.profilePicUrl || `https://ui-avatars.com/api/?name=${host?.name || 'A'}&background=random&color=fff`} 
-                                    alt={host?.name || 'Host'}
-                                    className="w-16 h-16 rounded-full object-cover shadow-md"
-                                />
-                                <div>
-                                    <p className="font-bold text-lg">{host?.name || 'AI-School Team'}</p>
-                                    <p className="text-sm text-gray-600">{host?.role || 'Instructor'}</p>
-                                </div>
+                    <div className="border-t border-gray-300 pt-4 sm:pt-6">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Details</h3>
+                        <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+                            <div className="flex items-center gap-2 sm:gap-3 text-gray-700">
+                                <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500" />
+                                <span>On-demand</span>
                             </div>
-
-                            <div className="border-t border-gray-300 pt-6">
-                                <h3 className="text-lg font-semibold text-gray-900 mb-4">Details</h3>
-                                <div className="space-y-3 text-sm">
-                                    <div className="flex items-center gap-3 text-gray-700">
-                                        <Clock className="w-5 h-5 text-gray-500" />
-                                        <span>On-demand</span>
-                                    </div>
-                                    <div className="flex items-center gap-3 text-gray-700">
-                                        <span className="inline-block bg-green-100 text-green-800 font-medium px-2 py-1 rounded">
-                                            {workshop.courseLevel}
-                                        </span>
-                                    </div>
-                                </div>
+                            <div className="flex items-center gap-2 sm:gap-3 text-gray-700">
+                                <span className="inline-block bg-green-100 text-green-800 font-medium px-2 py-1 rounded text-xs sm:text-sm">
+                                    {workshop.courseLevel}
+                                </span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
     );
 };
 

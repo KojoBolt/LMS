@@ -88,69 +88,67 @@ const GuideDetails = () => {
 
     return (
         <div className="min-h-screen bg-white lg:ml-[300px] mb-[60px] lg:mb-0 mt-[60px] lg:mt-0">
-            <div className="max-w-7xl mx-auto px-4 py-12">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Main Content Area */}
-                    <div className="lg:col-span-2">
-                        <h1 className="text-4xl font-bold text-gray-900 mb-6">{guide.courseTitle}</h1>
-                        
-                       
-                        <div className="space-y-12">
-                            {guide.sections && guide.sections[0]?.lessons.map(lesson => (
-                                <div key={lesson.id}>
-                                    
-                                    
-                                    {lesson.videoUrl && (
-                                        <div className="bg-black rounded-lg aspect-video my-6 flex items-center justify-center overflow-hidden">
-                                            <iframe
-                                                src={getEmbedUrl(lesson.videoUrl)}
-                                                className="w-full h-full"
-                                                allow="autoplay; encrypted-media; picture-in-picture"
-                                                allowFullScreen
-                                                title={lesson.title}
-                                            ></iframe>
-                                        </div>
-                                    )}
-
-                                    <div className="prose max-w-none bg-gray-50 p-6 rounded-lg  border border-gray-200">
-                                        <h2 className="text-3xl font-bold text-gray-900 mb-4">{lesson.title}</h2>
-                                        <SlateViewer value={lesson.content} />
-                                    </div>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
+            {/* Main Content Area */}
+            <div className="lg:col-span-2">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">{guide.courseTitle}</h1>
+                
+                <div className="space-y-8 sm:space-y-10 md:space-y-12">
+                    {guide.sections && guide.sections[0]?.lessons.map(lesson => (
+                        <div key={lesson.id}>
+                            
+                            {lesson.videoUrl && (
+                                <div className="bg-black rounded-lg aspect-video my-4 sm:my-6 flex items-center justify-center overflow-hidden">
+                                    <iframe
+                                        src={getEmbedUrl(lesson.videoUrl)}
+                                        className="w-full h-full"
+                                        allow="autoplay; encrypted-media; picture-in-picture"
+                                        allowFullScreen
+                                        title={lesson.title}
+                                    ></iframe>
                                 </div>
-                            ))}
+                            )}
+
+                            <div className="prose max-w-none bg-gray-50 p-4 sm:p-5 md:p-6 rounded-lg border border-gray-200">
+                                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">{lesson.title}</h2>
+                                <SlateViewer value={lesson.content} />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="lg:col-span-1">
+                <div className="bg-gray-50 rounded-lg p-4 sm:p-5 md:p-6 lg:sticky lg:top-8 mt-0 lg:mt-[60px] border border-gray-200 max-w-2xl">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Instructor</h3>
+                    <div className="flex items-center gap-3 mb-4 sm:mb-6">
+                        <img 
+                            src={instructor?.profilePicUrl || getInstructorAvatar(instructor?.name)} 
+                            alt={instructor?.name || 'Instructor'}
+                            className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
+                        />
+                        <div>
+                            <p className="font-semibold text-sm sm:text-base">{instructor?.name || 'Admin'}</p>
+                            <p className="text-xs sm:text-sm text-gray-600">{instructor?.role || 'Instructor'}</p>
                         </div>
                     </div>
+                    <hr className='my-4 sm:my-6 border-gray-200' />
 
-                    {/* Sidebar */}
-                    <div className="lg:col-span-1">
-                        <div className="bg-gray-50 rounded-lg p-6 sticky top-8 mt-[60px] border border-gray-200 max-w-2xl">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-4">Instructor</h3>
-                            <div className="flex items-center gap-3 mb-6">
-                                <img 
-                                    src={instructor?.profilePicUrl || getInstructorAvatar(instructor?.name)} 
-                                    alt={instructor?.name || 'Instructor'}
-                                    className="w-12 h-12 rounded-full object-cover"
-                                />
-                                <div>
-                                    <p className="font-semibold">{instructor?.name || 'Admin'}</p>
-                                    <p className="text-sm text-gray-600">{instructor?.role || 'Instructor'}</p>
-                                </div>
-                            </div>
-                            <hr className='my-6 border-gray-200' />
-
-                            <h3 className="text-[16px] font-semibold text-gray-900 mb-4">Categories</h3>
-                            <div className="flex flex-wrap gap-2">
-                                {guide.tags && guide.tags.map(tag => (
-                                    <span key={tag} className="bg-gray-200 text-gray-800 text-sm font-medium px-3 py-1 rounded-full">
-                                        {tag}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
+                    <h3 className="text-sm sm:text-[16px] font-semibold text-gray-900 mb-3 sm:mb-4">Categories</h3>
+                    <div className="flex flex-wrap gap-2">
+                        {guide.tags && guide.tags.map(tag => (
+                            <span key={tag} className="bg-gray-200 text-gray-800 text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded-full">
+                                {tag}
+                            </span>
+                        ))}
                     </div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
     );
 };
 

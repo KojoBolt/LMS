@@ -112,90 +112,95 @@ const Workshops = () => {
     }
 
     return (
-        <div className="max-w-7xl mx-auto p-6 bg-white lg:ml-[300px] mt-[60px] lg:mt-0 mb-[60px] lg:mb-0 overflow-auto overflow-x-hidden">
-            <div className="mb-8">
-                <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                    On-demand workshops
-                </h1>
-                <p className="text-gray-600 text-lg">
-                    Access our library of recorded workshops that you can watch anytime, at your own pace.
-                </p>
-            </div>
+        <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6 bg-white lg:ml-[300px] mt-[60px] lg:mt-0 mb-[60px] lg:mb-0 overflow-auto overflow-x-hidden">
+    <div className="mb-4 sm:mb-6 md:mb-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+            On-demand workshops
+        </h1>
+        <p className="text-gray-600 text-base sm:text-lg">
+            Access our library of recorded workshops that you can watch anytime, at your own pace.
+        </p>
+    </div>
 
-            <div className="flex justify-between items-center mb-8">
-                <div className="relative">
-                    <select 
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="appearance-none bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 pr-10 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent min-w-48"
-                    >
-                        <option>All categories</option>
-                        {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                </div>
-                
-                <button onClick={() => setSelectedCategory('All categories')} className="text-gray-600 hover:text-gray-800 font-medium">
-                    Clear filters
-                </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredWorkshops.map((workshop) => {
-                    const isEnrolled = userEnrolledCourseIds.has(workshop.id);
-                    
-                   
-                    const isAccessible = workshop.isFree || isEnrolled;
-
-                    return (
-                        <Link 
-                            to={isAccessible ? `/student/workshops/${workshop.id}` : `/student/checkout/${workshop.id}`}
-                            key={workshop.id} 
-                            className="bg-gray-50 rounded-lg overflow-hidden border border-gray-300 hover:shadow-md transition-shadow "
-                        >
-                            <div className="relative bg-black h-48">
-                                <img src={workshop.courseThumbnail || 'https://placehold.co/300x200/111827/FFFFFF?text=Workshop'} alt={workshop.courseTitle} className="w-full h-full object-cover opacity-50"/>
-                                <div className="absolute top-4 left-4 flex gap-2">
-                                    {workshop.tags && workshop.tags.map((tag, index) => (
-                                        <div key={index} className={`${getTagColor(tag)} text-white px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1`}>
-                                            {getTagIcon(tag)}
-                                            {tag}
-                                        </div>
-                                    ))}
-                                </div>
-                                
-                                <div className="absolute top-4 right-4 flex gap-2">
-                                    <button className="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-50">
-                                        <Bookmark className="w-4 h-4 text-gray-600" />
-                                    </button>
-                                    {/* The lock icon now renders if the workshop is NOT accessible */}
-                                    {!isAccessible && (
-                                        <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                                            <Lock className="w-4 h-4 text-gray-600" />
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="absolute bottom-4 right-4 w-16 h-16 bg-blue-500 rounded-full overflow-hidden border-2 border-white">
-                                    {/* Placeholder for instructor image */}
-                                    <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600"></div>
-                                </div>
-                            </div>
-                            
-                            <div className="p-6">
-                                <h3 className="text-xl font-semibold text-gray-900 mb-3 leading-tight h-16">
-                                    {workshop.courseTitle}
-                                </h3>
-                                <div className="space-y-2 text-sm text-gray-600">
-                                    <div>{workshop.courseCategory}</div>
-                                    <div>Hosted by {workshop.instructorName || 'AI-School'}</div>
-                                </div>
-                            </div>
-                        </Link>
-                    );
-                })}
-            </div>
+    <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6 md:mb-8">
+        <div className="relative flex-1 sm:flex-none">
+            <select 
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full appearance-none bg-gray-50 border border-gray-200 rounded-lg px-3 sm:px-4 py-2 sm:py-3 pr-8 sm:pr-10 text-sm sm:text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent sm:min-w-48"
+            >
+                <option>All categories</option>
+                {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+            </select>
+            <ChevronDown className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-gray-400 pointer-events-none" />
         </div>
+        
+        <button 
+            onClick={() => setSelectedCategory('All categories')} 
+            className="w-full sm:w-auto text-gray-600 hover:text-gray-800 font-medium text-sm sm:text-base py-2 sm:py-0"
+        >
+            Clear filters
+        </button>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+        {filteredWorkshops.map((workshop) => {
+            const isEnrolled = userEnrolledCourseIds.has(workshop.id);
+            const isAccessible = workshop.isFree || isEnrolled;
+
+            return (
+                <Link 
+                    to={isAccessible ? `/student/workshops/${workshop.id}` : `/student/checkout/${workshop.id}`}
+                    key={workshop.id} 
+                    className="bg-gray-50 rounded-lg overflow-hidden border border-gray-300 hover:shadow-md transition-shadow"
+                >
+                    <div className="relative bg-black h-40 sm:h-44 md:h-48">
+                        <img 
+                            src={workshop.courseThumbnail || 'https://placehold.co/300x200/111827/FFFFFF?text=Workshop'} 
+                            alt={workshop.courseTitle} 
+                            className="w-full h-full object-cover opacity-50"
+                        />
+                        <div className="absolute top-3 sm:top-4 left-3 sm:left-4 flex gap-1 sm:gap-2 flex-wrap">
+                            {workshop.tags && workshop.tags.map((tag, index) => (
+                                <div key={index} className={`${getTagColor(tag)} text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1`}>
+                                    {getTagIcon(tag)}
+                                    <span className="hidden xs:inline">{tag}</span>
+                                </div>
+                            ))}
+                        </div>
+                        
+                        <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex gap-1 sm:gap-2">
+                            <button className="w-7 h-7 sm:w-8 sm:h-8 bg-white rounded-full flex items-center justify-center hover:bg-gray-50">
+                                <Bookmark className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
+                            </button>
+                            {/* The lock icon now renders if the workshop is NOT accessible */}
+                            {!isAccessible && (
+                                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white rounded-full flex items-center justify-center">
+                                    <Lock className="w-3 h-3 sm:w-4 sm:h-4 text-gray-600" />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="absolute bottom-3 sm:bottom-4 right-3 sm:right-4 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-blue-500 rounded-full overflow-hidden border-2 border-white">
+                            {/* Placeholder for instructor image */}
+                            <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600"></div>
+                        </div>
+                    </div>
+                    
+                    <div className="p-4 sm:p-5 md:p-6">
+                        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 sm:mb-3 leading-tight h-12 sm:h-14 md:h-16 overflow-hidden">
+                            {workshop.courseTitle}
+                        </h3>
+                        <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-gray-600">
+                            <div>{workshop.courseCategory}</div>
+                            <div>Hosted by {workshop.instructorName || 'AI-School'}</div>
+                        </div>
+                    </div>
+                </Link>
+            );
+        })}
+    </div>
+</div>
     );
 };
 

@@ -86,67 +86,78 @@ const Guides = () => {
 };
 
     return (
-        <div className="max-w-7xl mx-auto p-6 bg-white lg:ml-[300px] mt-[60px] lg:mt-0 mb-[60px] lg:mb-0 overflow-auto overflow-x-hidden">
-            <h1 className="text-4xl font-bold text-gray-900 mb-8">Guides</h1>
-            
-            <div className="flex items-center gap-4 mb-8">
-                <div className="relative">
-                    <select 
-                        value={categoryFilter}
-                        onChange={(e) => setCategoryFilter(e.target.value)}
-                        className="appearance-none bg-gray-100 border border-gray-300 rounded-lg px-4 py-2 pr-8 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-                    </select>
-                    <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-                </div>
-                
-                <div className="relative">
-                    <select 
-                        value={skillFilter}
-                        onChange={(e) => setSkillFilter(e.target.value)}
-                        className="appearance-none bg-gray-100 border border-gray-300 rounded-lg px-4 py-2 pr-8 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                        {skillLevels.map(level => <option key={level} value={level}>{level}</option>)}
-                    </select>
-                    <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-                </div>
-                
-                <button onClick={clearFilters} className="ml-auto text-gray-600 hover:text-gray-800 bg-gray-100 px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-300 ">
-                    Clear filters
-                </button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredGuides.map((guide) => (
-                    <Link to={`/student/guides/${guide.id}`} key={guide.id} className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                        <div className={`h-48 relative p-4 bg-gray-800`}>
-                            <img src={guide.courseThumbnail || 'https://placehold.co/400x200/111827/FFFFFF?text=Guide'} alt={guide.courseTitle} className="w-full h-full object-cover opacity-50 "/>
-                            <button className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm rounded-full p-2 shadow-sm hover:shadow-md transition-shadow">
-                                <Bookmark className="w-4 h-4 text-white" />
-                            </button>
-                            <div className="absolute bottom-4 right-4 w-10 h-10 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
-                                <span className="text-white font-semibold text-sm">A</span>
-                            </div>
-                        </div>
-                        
-                        <div className="p-6">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2 leading-tight h-14">
-                                {guide.courseTitle}
-                            </h3>
-                            <div className="mb-4">
-                                <span className={`inline-block text-xs font-medium px-2 py-1 rounded border ${getLevelColors(guide.courseLevel)}`}>
-  {guide.courseLevel}
-</span>
-                            </div>
-                            <div className="text-sm text-gray-600 h-10 overflow-hidden">
-                                {guide.tags && guide.tags.join(' | ')}
-                            </div>
-                        </div>
-                    </Link>
-                ))}
-            </div>
+        <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6 bg-white lg:ml-[300px] mt-[60px] lg:mt-0 mb-[60px] lg:mb-0 overflow-auto overflow-x-hidden">
+    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8">Guides</h1>
+    
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6 md:mb-8">
+        <div className="relative flex-1 sm:flex-none">
+            <select 
+                value={categoryFilter}
+                onChange={(e) => setCategoryFilter(e.target.value)}
+                className="w-full appearance-none bg-gray-100 border border-gray-300 rounded-lg px-3 sm:px-4 py-2 pr-8 text-sm sm:text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+                {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+            </select>
+            <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
         </div>
+        
+        <div className="relative flex-1 sm:flex-none">
+            <select 
+                value={skillFilter}
+                onChange={(e) => setSkillFilter(e.target.value)}
+                className="w-full appearance-none bg-gray-100 border border-gray-300 rounded-lg px-3 sm:px-4 py-2 pr-8 text-sm sm:text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+                {skillLevels.map(level => <option key={level} value={level}>{level}</option>)}
+            </select>
+            <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+        </div>
+        
+        <button 
+            onClick={clearFilters} 
+            className="w-full sm:w-auto sm:ml-auto text-gray-600 hover:text-gray-800 bg-gray-100 px-3 sm:px-4 py-2 rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-300 text-sm sm:text-base"
+        >
+            Clear filters
+        </button>
+    </div>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+        {filteredGuides.map((guide) => (
+            <Link 
+                to={`/student/guides/${guide.id}`} 
+                key={guide.id} 
+                className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+            >
+                <div className={`h-40 sm:h-44 md:h-48 relative p-3 sm:p-4 bg-gray-800`}>
+                    <img 
+                        src={guide.courseThumbnail || 'https://placehold.co/400x200/111827/FFFFFF?text=Guide'} 
+                        alt={guide.courseTitle} 
+                        className="w-full h-full object-cover opacity-50"
+                    />
+                    <button className="absolute top-3 sm:top-4 right-3 sm:right-4 bg-white/20 backdrop-blur-sm rounded-full p-1.5 sm:p-2 shadow-sm hover:shadow-md transition-shadow">
+                        <Bookmark className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                    </button>
+                    <div className="absolute bottom-3 sm:bottom-4 right-3 sm:right-4 w-8 h-8 sm:w-10 sm:h-10 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center">
+                        <span className="text-white font-semibold text-xs sm:text-sm">A</span>
+                    </div>
+                </div>
+                
+                <div className="p-4 sm:p-5 md:p-6">
+                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 leading-tight h-12 sm:h-14 overflow-hidden">
+                        {guide.courseTitle}
+                    </h3>
+                    <div className="mb-3 sm:mb-4">
+                        <span className={`inline-block text-xs font-medium px-2 py-1 rounded border ${getLevelColors(guide.courseLevel)}`}>
+                            {guide.courseLevel}
+                        </span>
+                    </div>
+                    <div className="text-xs sm:text-sm text-gray-600 h-8 sm:h-10 overflow-hidden">
+                        {guide.tags && guide.tags.join(' | ')}
+                    </div>
+                </div>
+            </Link>
+        ))}
+    </div>
+</div>
     );
 };
 
