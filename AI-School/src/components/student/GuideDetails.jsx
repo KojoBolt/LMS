@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../../lib/firebaseConfig'; // Adjust path if needed
-import SlateViewer from './SlateViewer'; // Make sure this path is correct
+import { db } from '../../lib/firebaseConfig'; 
+import SlateViewer from './SlateViewer'; 
+import { useTheme } from '../../context/ThemeContext'; 
 
 // Helper function to create a placeholder for the instructor image
 const getInstructorAvatar = (name) => {
@@ -28,6 +29,18 @@ const GuideDetails = () => {
     const [instructor, setInstructor] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { theme } = useTheme(); 
+
+
+    const containerBg = theme === 'dark' ? 'bg-[#171717]' : 'bg-gray-100';
+    const textColor = theme === 'dark' ? 'text-white' : 'text-gray-700';
+    const errorTextColor = theme === 'dark' ? 'text-red-400' : 'text-red-500';
+    const spinnerColor = theme === 'dark' ? 'border-white' : 'border-black';
+    const editorBg = theme === 'dark' ? 'bg-[#1E1E1E]' : 'bg-gray-50'
+    const iconColor = theme === 'dark' ? 'text-[#fff]' : 'bg-text-gray-600' 
+    const progressBG = theme === 'dark' ? 'bg-white' : 'bg-black'
+    const progressColor = theme === 'dark' ? 'bg-[#404040]' : 'bg-gray-200'
+
 
     useEffect(() => {
         if (!guideId) {
@@ -73,8 +86,8 @@ const GuideDetails = () => {
     }, [guideId]);
 
     if (loading) {
-        return <div className="flex justify-center items-center h-screen">
-                <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+        return <div className={`flex justify-center items-center h-screen lg:ml-[300px] ${containerBg}`}>
+                <div className={`w-12 h-12 border-4 ${spinnerColor} border-t-transparent rounded-full animate-spin`}></div>
             </div>;
     }
 
@@ -87,12 +100,12 @@ const GuideDetails = () => {
     }
 
     return (
-        <div className="min-h-screen bg-white lg:ml-[300px] mb-[60px] lg:mb-0 mt-[60px] lg:mt-0">
+        <div className={`min-h-screen ${containerBg} lg:ml-[300px] mb-[60px] lg:mb-0 mt-[60px] lg:mt-0`}>
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-6 sm:py-8 md:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Main Content Area */}
             <div className="lg:col-span-2">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6">{guide.courseTitle}</h1>
+                <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold ${textColor} mb-4 sm:mb-6`}>{guide.courseTitle}</h1>
                 
                 <div className="space-y-8 sm:space-y-10 md:space-y-12">
                     {guide.sections && guide.sections[0]?.lessons.map(lesson => (
@@ -110,9 +123,10 @@ const GuideDetails = () => {
                                 </div>
                             )}
 
-                            <div className="prose max-w-none bg-gray-50 p-4 sm:p-5 md:p-6 rounded-lg border border-gray-200">
-                                <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 mb-3 sm:mb-4">{lesson.title}</h2>
-                                <SlateViewer value={lesson.content} />
+                            <div className={`prose max-w-none ${editorBg} p-4 sm:p-5 md:p-6 rounded-lg border border-gray-200 ${textColor}`}>
+                                <h2 className={`text-xl sm:text-2xl md:text-3xl font-bold ${textColor} mb-3 sm:mb-4`}>{lesson.title}</h2>
+                                <SlateViewer 
+                                value={lesson.content} />
                             </div>
                         </div>
                     ))}
@@ -121,8 +135,8 @@ const GuideDetails = () => {
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-                <div className="bg-gray-50 rounded-lg p-4 sm:p-5 md:p-6 lg:sticky lg:top-8 mt-0 lg:mt-[60px] border border-gray-200 max-w-2xl">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Instructor</h3>
+                <div className={`${editorBg} rounded-lg p-4 sm:p-5 md:p-6 lg:sticky lg:top-8 mt-0 lg:mt-[60px] border border-gray-200 max-w-2xl`}>
+                    <h3 className={`text-base sm:text-lg font-semibold ${textColor} mb-3 sm:mb-4`}>Instructor</h3>
                     <div className="flex items-center gap-3 mb-4 sm:mb-6">
                         <img 
                             src={instructor?.profilePicUrl || getInstructorAvatar(instructor?.name)} 
@@ -130,13 +144,13 @@ const GuideDetails = () => {
                             className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
                         />
                         <div>
-                            <p className="font-semibold text-sm sm:text-base">{instructor?.name || 'Admin'}</p>
+                            <p className={`font-semibold text-sm sm:text-base ${textColor}`}>{instructor?.name || 'Admin'}</p>
                             <p className="text-xs sm:text-sm text-gray-600">{instructor?.role || 'Instructor'}</p>
                         </div>
                     </div>
                     <hr className='my-4 sm:my-6 border-gray-200' />
 
-                    <h3 className="text-sm sm:text-[16px] font-semibold text-gray-900 mb-3 sm:mb-4">Categories</h3>
+                    <h3 className={`text-sm sm:text-[16px] font-semibold ${textColor} mb-3 sm:mb-4`}>Categories</h3>
                     <div className="flex flex-wrap gap-2">
                         {guide.tags && guide.tags.map(tag => (
                             <span key={tag} className="bg-gray-200 text-gray-800 text-xs sm:text-sm font-medium px-2 sm:px-3 py-1 rounded-full">

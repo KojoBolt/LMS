@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { collection, getDocs, doc, getDoc, query } from 'firebase/firestore';
 import { db, auth } from '../../lib/firebaseConfig'; 
 import { onAuthStateChanged } from 'firebase/auth';
+import { useTheme } from '../../context/ThemeContext';
+
 
 const CourseList = () => {
   const [courses, setCourses] = useState([]);
@@ -15,8 +17,8 @@ const CourseList = () => {
   const [user, setUser] = useState(null);
   const [userEnrolledCourseIds, setUserEnrolledCourseIds] = useState([]);
   const navigate = useNavigate();
+  const { theme } = useTheme();
 
-  // --- Effect to get the current user's authentication state ---
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
@@ -24,7 +26,6 @@ const CourseList = () => {
     return () => unsubscribe();
   }, []);
 
-  // --- Effect to fetch the user's enrolled courses once they are logged in ---
   useEffect(() => {
     if (user) {
       const userDocRef = doc(db, 'users', user.uid);
@@ -38,7 +39,6 @@ const CourseList = () => {
     }
   }, [user]);
 
-  // --- Data fetching logic to get all courses and filter out guides ---
   useEffect(() => {
     const fetchCourses = async () => {
       setLoading(true);
@@ -50,7 +50,6 @@ const CourseList = () => {
           ...doc.data()
         }));
 
-        // Filter out any content that is explicitly a 'guide'
         const courseData = allContent.filter(item => item.contentType !== 'guide');
 
         setCourses(courseData);
@@ -64,12 +63,10 @@ const CourseList = () => {
     fetchCourses();
   }, []);
   
-  // --- Handler to decide where to navigate ---
   const handleCourseClick = (courseId) => {
     if (userEnrolledCourseIds.includes(courseId)) {
       navigate(`/student/courses/${courseId}`);
     } else {
-      // The original code had a typo here, it should go to checkout
       navigate(`/student/checkout/${courseId}`);
     }
   };
@@ -81,6 +78,10 @@ const CourseList = () => {
       setCurrentPage(currentPage + 1);
     }
   };
+    const textColor = theme === 'dark' ? 'text-black' : 'text-black';
+    const cardBg = theme === 'dark' ? 'bg-[#262626]' : 'bg-gray-50';
+    const borderBg = theme === 'dark' ? 'border border-gray-50' : 'border border-gray-200'
+    const shadowBG = theme === 'dark' ? 'shadow-2xl' : 'border border-gray-200'
 
   const getCurrentCourses = () => {
     const startIndex = currentPage * coursesPerPage;
@@ -123,7 +124,7 @@ const CourseList = () => {
             <div
               key={course.id}
               onClick={() => handleCourseClick(course.id)}
-              className="w-full sm:w-[48%] md:w-[31%] lg:w-[23%] bg-gray-100 rounded-xl transition-transform duration-200 hover:scale-[1.01] overflow-hidden border border-gray-700 hover:border-gray-900 cursor-pointer"
+              className={`w-full sm:w-[48%] md:w-[31%] lg:w-[23%] ${cardBg} rounded-xl transition-transform duration-200 ${shadowBG} hover:scale-[1.01] overflow-hidden cursor-pointer`}
             >
               <div className="relative h-[180px] rounded-t-xl overflow-hidden">
                 <img

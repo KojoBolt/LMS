@@ -5,6 +5,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../../lib/firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import paystackLogo from '../../assets/images/paystack.png';
+import { useTheme } from '../../context/ThemeContext';
 
 // This custom hook safely loads the Paystack script onto the page
 const usePaystackScript = () => {
@@ -45,7 +46,7 @@ const usePaystackScript = () => {
 const Checkout = () => {
     const { courseId } = useParams();
     const navigate = useNavigate();
-    const scriptLoaded = usePaystackScript(); // Use the hook to load the script
+    const scriptLoaded = usePaystackScript(); 
 
     // --- State Management ---
     const [user, setUser] = useState(null);
@@ -61,6 +62,16 @@ const Checkout = () => {
     const [states, setStates] = useState([]);
     const [paymentStatus, setPaymentStatus] = useState({ message: '', type: null, isVerifying: false });
     const [shippingIsBilling, setShippingIsBilling] = useState(true);
+    const { theme } = useTheme();
+
+    const containerBg = theme === 'dark' ? 'bg-[#171717]' : 'bg-gray-100';
+    const textColor = theme === 'dark' ? 'text-white' : 'text-gray-700';
+    const errorTextColor = theme === 'dark' ? 'text-red-400' : 'text-red-500';
+    const spinnerColor = theme === 'dark' ? 'border-white' : 'border-black';
+    const paystackBg = theme === 'dark' ? 'bg-[#1E1E1E]' : 'bg-gray-50';
+    const paystackColor = theme === 'dark' ? 'bg-[#3B3B3B]' : 'bg-blue-50'; 
+    const paystackTextColor = theme === 'dark' ? 'text-white' : 'text-gray-600';
+    
 
     // --- Authentication Effect ---
     useEffect(() => {
@@ -324,11 +335,11 @@ const Checkout = () => {
     const currency = 'GHS';
 
     return (
-        <div className="min-h-screen bg-gray-50 py-8 lg:ml-[300px] mt-[60px] lg:mt-0 mb-[60px] lg:mb-0">
+        <div className={`min-h-screen ${containerBg} py-8 lg:ml-[300px] mt-[60px] lg:mt-0 mb-[60px] lg:mb-0`}>
             <div className="max-w-6xl mx-auto px-4">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <div className="lg:col-span-2 space-y-6">
-                        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+                        <div className={`${paystackBg} rounded-lg p-6 shadow-sm border border-gray-200 ${textColor}`}>
                             <h2 className="text-lg font-semibold mb-6">Billing Address</h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div>
@@ -355,7 +366,7 @@ const Checkout = () => {
                                 </div>
                             </div>
                             <div className="mb-4">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                                <label className="block text-sm font-medium mb-2">Phone Number</label>
                                 <input 
                                     type="tel" 
                                     name="phoneNumber" 
@@ -382,7 +393,7 @@ const Checkout = () => {
                                         name="country" 
                                         value={formData.country} 
                                         onChange={handleCountryChange} 
-                                        className={`w-full px-3 py-2 border rounded-md ${errors.country ? 'border-red-500' : 'border-gray-300'}`}
+                                        className={`w-full px-3 py-2 border ${paystackBg} rounded-md ${errors.country ? 'border-red-500' : 'border-gray-300'}`}
                                     >
                                         <option value="">Select Country</option>
                                         {countries.map(country => (
@@ -397,7 +408,7 @@ const Checkout = () => {
                                         name="state" 
                                         value={formData.state} 
                                         onChange={handleInputChange} 
-                                        className={`w-full px-3 py-2 border rounded-md ${errors.state ? 'border-red-500' : 'border-gray-300'}`} 
+                                        className={`w-full px-3 py-2 border ${paystackBg} rounded-md ${errors.state ? 'border-red-500' : 'border-gray-300'}`} 
                                         disabled={!formData.country || states.length === 0}
                                     >
                                         <option value="">Select State</option>
@@ -428,7 +439,7 @@ const Checkout = () => {
                                         onChange={(e) => setShippingIsBilling(e.target.checked)} 
                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                                     />
-                                    <label htmlFor="shippingIsBilling" className="ml-2 block text-sm text-gray-900">
+                                    <label htmlFor="shippingIsBilling" className={`ml-2 block text-sm ${textColor}`}>
                                         Shipping address is the same as my billing address
                                     </label>
                                 </div>
@@ -441,20 +452,20 @@ const Checkout = () => {
                                         onChange={handleInputChange} 
                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                                     />
-                                    <label htmlFor="saveInfo" className="ml-2 block text-sm text-gray-900">
+                                    <label htmlFor="saveInfo" className={`ml-2 block text-sm ${textColor}`}>
                                         Save this information for next time
                                     </label>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-                            <h2 className="text-lg font-semibold mb-6">Payment Method</h2>
-                            <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
+                        <div className={`${paystackBg} rounded-lg p-6 shadow-sm border border-gray-200`}>
+                            <h2 className={`text-lg font-semibold mb-6 ${textColor}`}>Payment Method</h2>
+                            <div className={`border border-blue-200 rounded-lg p-4 ${paystackColor}`}>
                                 <div className="flex items-center mb-4">
                                     <img src={paystackLogo} alt="Paystack" className="w-18 rounded-2xl"/>
                                 </div>
-                                <p className="text-sm text-gray-600">
+                                <p className={`text-sm ${paystackTextColor}`}>
                                     You will be redirected to Paystack's secure checkout to complete your payment.
                                 </p>
                                 
@@ -482,8 +493,8 @@ const Checkout = () => {
                     </div>
 
                     <div className="lg:col-span-1">
-                        <div className="bg-white rounded-lg p-6 shadow-sm sticky top-8 border border-gray-200">
-                            <h2 className="text-lg font-semibold mb-6">Order Details</h2>
+                        <div className={`${paystackBg} rounded-lg p-6 shadow-sm sticky top-8 border border-gray-200`}>
+                            <h2 className={`text-lg font-semibold mb-6 ${textColor}`}>Order Details</h2>
                             <div className="space-y-4 mb-6">
                                 <div className="flex items-start space-x-3">
                                     <img 
@@ -501,16 +512,16 @@ const Checkout = () => {
                                     </div>
                                 </div>
                             </div>
-                            <div className="border-t pt-4 space-y-2">
-                                <div className="flex justify-between text-sm">
+                            <div className={`border-t pt-4 space-y-2 ${textColor}`}>
+                                <div className={`flex justify-between text-sm ${textColor}`}>
                                     <span>Sub Total</span>
                                     <span>{currency} {subtotal.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-sm">
+                                <div className={`flex justify-between text-sm ${textColor}`}>
                                     <span>Tax</span>
                                     <span>{currency} {tax.toFixed(2)}</span>
                                 </div>
-                                <div className="flex justify-between text-lg font-semibold pt-2 border-t">
+                                <div className={`flex justify-between text-lg font-semibold pt-2 border-t ${textColor}`}>
                                     <span>Total</span>
                                     <span>{currency} {total.toFixed(2)}</span>
                                 </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { auth, db } from '../../lib/firebaseConfig'; 
 import { onAuthStateChanged, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from 'firebase/auth';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { useTheme } from '../../context/ThemeContext'; 
 
 const Profile = () => {
     // State for user data and form inputs
@@ -26,6 +27,8 @@ const Profile = () => {
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState('');
+
+    const { theme } = useTheme(); 
 
     // --- Fetch User Data ---
     useEffect(() => {
@@ -93,8 +96,7 @@ const Profile = () => {
         setSuccessMessage('');
 
         try {
-            // --- THIS IS THE FIX ---
-            // It now correctly uses the 'profilePicturePreview' state variable that exists in this component.
+
             let newProfilePicUrl = profilePicturePreview; 
             if (profilePictureFile) {
                 newProfilePicUrl = await handleFileUpload(profilePictureFile);
@@ -154,22 +156,28 @@ const Profile = () => {
             setIsUpdatingPassword(false);
         }
     };
+    const containerBg = theme === 'dark' ? 'bg-[#171717]' : 'bg-white';
+    const textColor = theme === 'dark' ? 'text-white' : 'text-black';
+    const cardColor = theme === 'dark' ? 'bg-[#262626]' : 'bg-gray-100';
+    const spinnerColor = theme === 'dark' ? 'border-white' : 'border-black';
+    const borderColor = theme === 'dark' ? 'border-black/50' : 'border-gray-200';
+    const btnColor = theme === 'dark' ? 'bg-gray-700' : 'bg-black'
 
     if (loading) {
-        return <div className="flex justify-center items-center h-screen">
-            <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+        return <div className={`flex justify-center items-center h-screen ${containerBg}`}>
+            <div className={`w-12 h-12 border-4 ${spinnerColor} border-t-transparent rounded-full animate-spin`}></div>
         </div>;
     }
 
     return (
-        <div className="lg:max-w-6xl lg:mx-auto p-8 bg-white lg:ml-[300px] w-[100%] overflow-x-hidden">
-            <h1 className="text-3xl font-bold text-gray-900 mb-5 mt-[30px]">Profile</h1>
+        <div className={`p-3 sm:p-4 md:p-6 ${containerBg} h-screen lg:ml-[300px] mt-[60px] lg:mt-0 mb-[60px] lg:mb-0 overflow-x-hidden`}>
+            <h1 className={`text-3xl font-bold ${textColor} mb-5 mt-[30px]`}>Profile</h1>
 
             {/* --- Profile Details Section --- */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-1">
-                    <h2 className="text-xl font-semibold text-gray-900">Profile details</h2>
-                    <p className="mt-1 text-sm text-gray-600">
+                    <h2 className={`text-xl font-semibold ${textColor}`}>Profile details</h2>
+                    <p className={`mt-1 text-sm ${textColor}`}>
                         This information will be displayed publicly so be careful what you share.
                     </p>
                 </div>
@@ -195,27 +203,27 @@ const Profile = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">First name</label>
+                            <label className={`block text-sm font-medium ${textColor} mb-1`}>First name</label>
                             <input
                                 type="text"
                                 value={firstName}
                                 onChange={(e) => setFirstName(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${textColor}`}
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Last name</label>
+                            <label className={`block text-sm font-medium ${textColor} mb-1`}>Last name</label>
                             <input
                                 type="text"
                                 value={lastName}
                                 onChange={(e) => setLastName(e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${textColor}`}
                             />
                         </div>
 
                         <div className="sm:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
+                            <label className={`block text-sm font-medium ${textColor} mb-1`}>Email address</label>
                             <input
                                 type="email"
                                 value={email}
@@ -228,7 +236,7 @@ const Profile = () => {
                             <button 
                                 onClick={handleProfileUpdate}
                                 disabled={isUpdatingProfile}
-                                className="bg-black text-white px-6 py-3 rounded font-medium hover:bg-gray-700 transition-colors disabled:bg-gray-400"
+                                className={`${btnColor} text-white px-6 py-3 rounded font-medium hover:bg-gray-700 transition-colors disabled:bg-gray-400`}
                             >
                                 {isUpdatingProfile ? 'Saving...' : 'Save changes'}
                             </button>
@@ -245,8 +253,8 @@ const Profile = () => {
             {/* --- Password Update Section --- */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-[65px] lg:mb-0">
                 <div className="md:col-span-1">
-                    <h2 className="text-xl font-semibold text-gray-900">Update password</h2>
-                    <p className="mt-1 text-sm text-gray-600">
+                    <h2 className={`text-xl font-semibold ${textColor}`}>Update password</h2>
+                    <p className={`mt-1 text-sm ${textColor}`}>
                         Ensure your account is using a long, random password to stay secure.
                     </p>
                 </div>
@@ -254,7 +262,7 @@ const Profile = () => {
                 <div className="md:col-span-2">
                     <div className="space-y-6">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Current password</label>
+                            <label className={`block text-sm font-medium ${textColor} mb-1`}>Current password</label>
                             <input
                                 type="password"
                                 value={currentPassword}
@@ -265,7 +273,7 @@ const Profile = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">New password</label>
+                            <label className={`block text-sm font-medium ${textColor} mb-1`}>New password</label>
                             <input
                                 type="password"
                                 value={newPassword}
@@ -276,7 +284,7 @@ const Profile = () => {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Confirm new password</label>
+                            <label className={`block text-sm font-medium ${textColor} mb-1`}>Confirm new password</label>
                             <input
                                 type="password"
                                 value={confirmPassword}
@@ -290,7 +298,7 @@ const Profile = () => {
                             <button 
                                 onClick={handlePasswordUpdate} 
                                 disabled={isUpdatingPassword}
-                                className="bg-black text-white px-6 py-3 rounded font-medium hover:bg-gray-700 transition-colors disabled:bg-gray-400"
+                                className={`${btnColor} text-white px-6 py-3 rounded font-medium hover:bg-gray-700 transition-colors disabled:bg-gray-400`}
                             >
                                 {isUpdatingPassword ? 'Updating...' : 'Update password'}
                             </button>

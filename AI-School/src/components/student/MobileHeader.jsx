@@ -5,12 +5,17 @@ import { auth, db } from '../../lib/firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
 import SideLogo from '../../assets/images/logoblack.png'; 
+import { useTheme } from '../../context/ThemeContext';
+import SideLogoDark from '../../assets/images/logoai.png'
+
 
 const MobileHeader = () => {
     const [isNotificationPopupOpen, setIsNotificationPopupOpen] = useState(false);
     const [notifications, setNotifications] = useState([]);
     const [user, setUser] = useState(null);
     const notificationPopupRef = useRef(null);
+    const { theme } = useTheme();
+    
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -44,14 +49,22 @@ const MobileHeader = () => {
         };
     }, []);
 
+    const containerBg = theme === 'dark' ? 'bg-black' : 'bg-white';
+
     return (
-        <div className="lg:hidden fixed top-0 left-0 right-0 bg-white shadow-sm p-4 z-40">
+        <div className={`lg:hidden fixed top-0 left-0 right-0 ${containerBg} shadow-sm p-3 z-40  border-b border-b-[#3B3B3B]`}>
             <div className="flex justify-between items-center">
                 
                 <div className="text-xl font-bold">
                     {/* <span className="text-gray-800">The AI</span>
                     <span className="text-purple-600">School</span> */}
-                    <img src={SideLogo} alt="Logo" className='w-15 h-10' />
+                <div className=" text-center">
+                      {theme === 'dark' ? (
+                        <img src={SideLogoDark} alt="logo" className='w-18 h-10 ' />
+                                ) : (
+                           <img src={SideLogo} alt="logo" className='w-18 h-10 ' />
+                             )}
+                </div>
                 </div>
 
                 

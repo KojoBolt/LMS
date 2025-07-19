@@ -4,6 +4,8 @@ import { Bookmark, Lock, ChevronDown } from 'lucide-react';
 import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../../../lib/firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
+import { useTheme } from '../../../context/ThemeContext'; 
+
 
 const Workshops = () => {
     // --- State for dynamic data ---
@@ -19,6 +21,8 @@ const Workshops = () => {
     const [selectedCategory, setSelectedCategory] = useState('All categories');
     const navigate = useNavigate();
 
+    const { theme } = useTheme(); 
+    
     // --- Effect to get the current user's authentication state ---
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -101,9 +105,16 @@ const Workshops = () => {
         return null;
     };
 
+    const containerBg = theme === 'dark' ? 'bg-[#171717]' : 'bg-white';
+    const textColor = theme === 'dark' ? 'text-white' : 'text-black';
+    const cardColor = theme === 'dark' ? 'bg-[#262626]' : 'bg-gray-100';
+    const spinnerColor = theme === 'dark' ? 'border-white' : 'border-black';
+    const borderColor = theme === 'dark' ? 'border-black/50' : 'border-gray-200';
+    const Hover = theme === 'dark' ? 'hover:text-white' : 'hover:text-gray-800'
+
     if (loading) {
-        return <div className="flex justify-center items-center h-screen">
-                <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+        return <div className={`flex justify-center items-center h-screen ${containerBg}`}>
+                <div className={`w-12 h-12 border-4 ${spinnerColor} border-t-transparent rounded-full animate-spin`}></div>
             </div>;
     }
 
@@ -112,12 +123,12 @@ const Workshops = () => {
     }
 
     return (
-        <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6 bg-white lg:ml-[300px] mt-[60px] lg:mt-0 mb-[60px] lg:mb-0 overflow-auto overflow-x-hidden">
+    <div className={`p-3 sm:p-4 md:p-6 ${containerBg} h-screen lg:ml-[300px] mt-[60px] lg:mt-0 mb-[60px] lg:mb-0 overflow-hidden overflow-x-hidden`}>
     <div className="mb-4 sm:mb-6 md:mb-8">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+        <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold ${textColor} mb-2`}>
             On-demand workshops
         </h1>
-        <p className="text-gray-600 text-base sm:text-lg">
+        <p className={`${textColor} text-base sm:text-lg`}>
             Access our library of recorded workshops that you can watch anytime, at your own pace.
         </p>
     </div>
@@ -137,7 +148,7 @@ const Workshops = () => {
         
         <button 
             onClick={() => setSelectedCategory('All categories')} 
-            className="w-full sm:w-auto text-gray-600 hover:text-gray-800 font-medium text-sm sm:text-base py-2 sm:py-0"
+            className={`w-full sm:w-auto ${textColor} ${Hover} font-medium text-sm sm:text-base py-2 sm:py-4 sm:px-3 rounded-2xl ${cardColor} shadow`}
         >
             Clear filters
         </button>
@@ -152,7 +163,7 @@ const Workshops = () => {
                 <Link 
                     to={isAccessible ? `/student/workshops/${workshop.id}` : `/student/checkout/${workshop.id}`}
                     key={workshop.id} 
-                    className="bg-gray-50 rounded-lg overflow-hidden border border-gray-300 hover:shadow-md transition-shadow"
+                    className={`${cardColor} rounded-lg overflow-hidden border ${borderColor} hover:shadow-md transition-shadow`}
                 >
                     <div className="relative bg-black h-40 sm:h-44 md:h-48">
                         <img 
@@ -188,10 +199,10 @@ const Workshops = () => {
                     </div>
                     
                     <div className="p-4 sm:p-5 md:p-6">
-                        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 sm:mb-3 leading-tight h-12 sm:h-14 md:h-16 overflow-hidden">
+                        <h3 className={`text-lg sm:text-xl font-semibold ${textColor} mb-2 sm:mb-3 leading-tight h-12 sm:h-14 md:h-16 overflow-hidden`}>
                             {workshop.courseTitle}
                         </h3>
-                        <div className="space-y-1 sm:space-y-2 text-xs sm:text-sm text-gray-600">
+                        <div className={`space-y-1 sm:space-y-2 text-xs sm:text-sm ${textColor}`}>
                             <div>{workshop.courseCategory}</div>
                             <div>Hosted by {workshop.instructorName || 'AI-School'}</div>
                         </div>

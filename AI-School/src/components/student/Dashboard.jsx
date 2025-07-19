@@ -3,13 +3,15 @@ import { collection, getDocs, doc, getDoc, query, where } from 'firebase/firesto
 import { db, auth } from '../../lib/firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import {useOutletContext} from 'react-router-dom'; 
+import { useTheme } from '../../context/ThemeContext'; // Import theme context
 
 import CourseList from "./CourseList"; 
 import Categories from "./Categories";
 import MainContent from "./MainContent";
 
 const Dashboard = () => {
- const { searchTerm } = useOutletContext(); 
+    const { searchTerm } = useOutletContext(); 
+    const { theme } = useTheme(); // Use theme context
 
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -66,7 +68,7 @@ const Dashboard = () => {
         fetchAllData();
     }, [user]); // This effect re-runs if the user logs in or out
    
-   const filteredEnrolledCourses = useMemo(() => {
+    const filteredEnrolledCourses = useMemo(() => {
         if (!searchTerm) return enrolledCourses;
         return enrolledCourses.filter(course => 
             course.courseTitle.toLowerCase().includes(searchTerm.toLowerCase())
@@ -80,22 +82,27 @@ const Dashboard = () => {
         );
     }, [searchTerm, allCourses]);
 
+    // Theme-aware styles
+    const containerBg = theme === 'dark' ? 'bg-[#171717]' : 'bg-white';
+    const textColor = theme === 'dark' ? 'text-white' : 'text-black';
+    const errorTextColor = theme === 'dark' ? 'text-red-400' : 'text-red-500';
+    const spinnerColor = theme === 'dark' ? 'border-white' : 'border-black';
 
     // --- This is the single loading state for the entire page ---
     if (loading) {
         return (
-            <div className="flex justify-center items-center h-screen lg:ml-[300px]">
-                <div className="w-12 h-12 border-4 border-black-600 border-t-transparent rounded-full animate-spin"></div>
+            <div className={`flex justify-center items-center h-screen lg:ml-[300px] ${containerBg}`}>
+                <div className={`w-12 h-12 border-4 ${spinnerColor} border-t-transparent rounded-full animate-spin`}></div>
             </div>
         );
     }
     
     if (error) {
-        return <div className="p-8 ml-[300px] text-red-500">{error}</div>;
+        return <div className={`p-8 ml-[300px] ${errorTextColor} ${containerBg} min-h-screen`}>{error}</div>;
     }
 
     return (
-        <div className="p-6 w-[ calc(100vw - 300px)] max-w-[calc(100vw - 300px)] lg:ml-[300px] overflow-auto overflow-x-hidden bg-white mt-4 lg:mt-0">
+        <div className={`p-6 w-[calc(100vw - 300px)] max-w-[calc(100vw - 300px)] lg:ml-[300px] overflow-auto overflow-x-hidden ${containerBg} ${textColor} mt-[60px] lg:mt-0 min-h-screen`}>
             {/* Pass the fetched data down to the child components as props */}
             <MainContent enrolledCourses={filteredEnrolledCourses} />
             <div className="mt-10">

@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, GraduationCap, CheckCircle } from 'lucide-react';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getFirestore, collection, getDocs, query, where, limit, doc, getDoc, setDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
-import { getAuth, signInAnonymously, signInWithCustomToken } from 'firebase/auth';
+import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
 import { useParams } from 'react-router-dom';
 import SlateViewer from './SlateViewer'; 
+import { useTheme } from '../../context/ThemeContext'; 
+
 
 // Firebase config and initial tokens remain the same...
 const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config)
@@ -19,15 +21,26 @@ const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 const CourseDetails = () => {
     const { courseId } = useParams();
     const [db, setDb] = useState(null);
-    const [auth, setAuth] = useState(null); // NEW: State for auth instance
+    const [auth, setAuth] = useState(null);
+    const [authLoading, setAuthLoading] = useState(true); // NEW: Track auth loading state
     const [course, setCourse] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
     const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
+    const { theme } = useTheme(); 
 
     // NEW: State to track IDs of completed lessons. A Set is used for efficient add/check operations.
     const [completedLessons, setCompletedLessons] = useState(new Set());
+
+    const containerBg = theme === 'dark' ? 'bg-[#171717]' : 'bg-gray-100';
+    const textColor = theme === 'dark' ? 'text-white' : 'text-gray-700';
+    const errorTextColor = theme === 'dark' ? 'text-red-400' : 'text-red-500';
+    const spinnerColor = theme === 'dark' ? 'border-white' : 'border-black';
+    const editorBg = theme === 'dark' ? 'bg-[#1E1E1E]' : 'bg-[#FFFFFF]'
+    const iconColor = theme === 'dark' ? 'text-[#fff]' : 'bg-text-gray-600' 
+    const progressBG = theme === 'dark' ? 'bg-white' : 'bg-black'
+    const progressColor = theme === 'dark' ? 'bg-[#404040]' : 'bg-gray-200'
 
     useEffect(() => {
         // Reset state when courseId changes
@@ -45,32 +58,58 @@ const CourseDetails = () => {
                 const firestore = getFirestore(app);
                 const authInstance = getAuth(app);
 
-                if (!authInstance.currentUser) {
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(authInstance, initialAuthToken);
-                    } else {
-                        // Handle anonymous sign-in or error as before
-                        setError("Authentication is required.");
-                        setLoading(false);
-                        return;
-                    }
-                }
-                
                 setDb(firestore);
-                setAuth(authInstance); // Save auth instance
+                setAuth(authInstance);
+
+                // NEW: Listen to auth state changes instead of checking immediately
+                const unsubscribe = onAuthStateChanged(authInstance, async (user) => {
+                    if (user) {
+                        // User is signed in
+                        setAuthLoading(false);
+                    } else {
+                        // No user, try to authenticate
+                        try {
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(authInstance, initialAuthToken);
+                            } else {
+                                // Handle anonymous sign-in or error as before
+                                setError("Authentication is required.");
+                                setAuthLoading(false);
+                                setLoading(false);
+                                return;
+                            }
+                        } catch (authError) {
+                            console.error("Authentication Error:", authError);
+                            setError("Authentication failed.");
+                            setAuthLoading(false);
+                            setLoading(false);
+                        }
+                    }
+                });
+
+                // Return cleanup function to unsubscribe when component unmounts
+                return unsubscribe;
             } catch (err) {
                 console.error("Firebase Initialization Error:", err);
                 setError("Could not connect to the database.");
+                setAuthLoading(false);
                 setLoading(false);
             }
         };
 
-        initializeFirebase();
+        const unsubscribe = initializeFirebase();
+        
+        // Cleanup function
+        return () => {
+            if (unsubscribe && typeof unsubscribe === 'function') {
+                unsubscribe();
+            }
+        };
     }, []);
 
     // NEW: useEffect to fetch user progress after Firebase and course are ready
     useEffect(() => {
-        if (!db || !auth || !auth.currentUser || !course) return;
+        if (!db || !auth || !auth.currentUser || !course || authLoading) return;
 
         const fetchProgress = async () => {
             const userId = auth.currentUser.uid;
@@ -85,11 +124,12 @@ const CourseDetails = () => {
         };
 
         fetchProgress();
-    }, [db, auth, course]);
+    }, [db, auth, course, authLoading]);
 
 
     useEffect(() => {
-        if (!db || !courseId) return;
+        // MODIFIED: Don't fetch course if auth is still loading
+        if (!db || !courseId || authLoading) return;
 
         const fetchCourseById = async () => {
         setLoading(true);
@@ -119,7 +159,7 @@ const CourseDetails = () => {
         };
 
         fetchCourseById();
-    }, [db, courseId]);
+    }, [db, courseId, authLoading]);
 
     const getCurrentLesson = () => {
         if (!course || !course.sections || course.sections.length === 0) return null;
@@ -201,8 +241,13 @@ const CourseDetails = () => {
         return url; 
     };
 
-    if (loading) {
-        return <div className="flex justify-center items-center min-h-screen ml-[300px]"><p>Loading course...</p></div>;
+    // MODIFIED: Show loading while either course or auth is loading
+    if (loading || authLoading) {
+        return (
+            <div className={`flex justify-center items-center h-screen lg:ml-[300px] ${containerBg}`}>
+                <div className={`w-12 h-12 border-4 ${spinnerColor} border-t-transparent rounded-full animate-spin`}></div>
+            </div>
+        );
     }
 
     if (error) {
@@ -213,6 +258,7 @@ const CourseDetails = () => {
         return <div className="flex justify-center items-center min-h-screen ml-[300px]"><p>No course available.</p></div>;
     }
     
+    
     // DYNAMIC PROGRESS: These calculations are now based on state
     const totalLessons = course.sections.reduce((acc, section) => acc + (section.lessons ? section.lessons.length : 0), 0);
     const progressPercentage = totalLessons > 0 ? (completedLessons.size / totalLessons) * 100 : 0;
@@ -221,10 +267,10 @@ const CourseDetails = () => {
     const isCurrentLessonCompleted = currentLesson && completedLessons.has(currentLesson.id);
 
     return (
-        <div className="min-h-screen bg-gray-100 lg:ml-[300px] sm:mt-[60px] mt-[60px] lg:mt-0">
+    <div className={`min-h-screen ${containerBg} lg:ml-[300px] sm:mt-[60px] mt-[60px] lg:mt-0`}>
     <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
         <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">{course.courseTitle}</h1>
+            <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold ${textColor} mb-2`}>{course.courseTitle}</h1>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -247,15 +293,15 @@ const CourseDetails = () => {
                     )}
                 </div>
 
-                <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 mb-4 sm:mb-6 border border-gray-400">
+                <div className={`rounded-lg p-4 sm:p-5 md:p-6 mb-4 sm:mb-6 border border-gray-400 ${editorBg}`}>
                     <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-                        <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-gray-600" />
-                        <h2 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900">
+                        <GraduationCap className={`w-5 h-5 sm:w-6 sm:h-6 ${iconColor}`} />
+                        <h2 className={`text-lg sm:text-xl md:text-2xl font-semibold ${textColor}`}>
                             {currentLesson ? currentLesson.title : 'No lesson selected'}
                         </h2>
                     </div>
                     
-                    <div className="text-gray-700 text-base sm:text-lg leading-relaxed mb-4 sm:mb-6 prose max-w-none">
+                    <div className={`${textColor} text-base sm:text-lg leading-relaxed mb-4 sm:mb-6 prose max-w-none`}>
                         {/* SlateViewer remains the same */}
                         {currentLesson?.content ? (
                             <SlateViewer
@@ -307,18 +353,18 @@ const CourseDetails = () => {
 
             <div className="lg:col-span-1">
                 {/* DYNAMIC: Progress bar UI now uses dynamic values */}
-                <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 mb-4 sm:mb-6 border border-gray-400">
+                <div className={`${editorBg} rounded-lg p-4 sm:p-5 md:p-6 mb-4 sm:mb-6 border border-gray-400`}>
                     <div className="flex justify-between items-center mb-3">
-                        <h3 className="text-base sm:text-lg font-semibold text-gray-900">Course Progress</h3>
+                        <h3 className={`text-base sm:text-lg font-semibold ${textColor}`}>Course Progress</h3>
                         <span className="text-xs sm:text-sm text-gray-500">{Math.round(progressPercentage)}% Complete</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div className="bg-black h-2 rounded-full" style={{ width: `${progressPercentage}%` }}></div>
+                    <div className={`w-full ${progressColor} rounded-full h-2`}>
+                        <div className={`${progressBG} h-2 rounded-full`} style={{ width: `${progressPercentage}%` }}></div>
                     </div>
                 </div>
 
-                <div className="bg-white rounded-lg p-4 sm:p-5 md:p-6 border border-gray-400 mb-16 lg:mb-0">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Course Content</h3>
+                <div className={`${editorBg} rounded-lg p-4 sm:p-5 md:p-6 border border-gray-400 mb-16 lg:mb-0`}>
+                    <h3 className={`text-base sm:text-lg font-semibold ${textColor} mb-3 sm:mb-4`}>Course Content</h3>
                     
                     <div className="space-y-3 sm:space-y-4">
                         {course.sections && course.sections.map((section, secIndex) => (

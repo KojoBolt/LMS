@@ -5,6 +5,7 @@ import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firesto
 import { db, auth } from '../../../lib/firebaseConfig';
 import { onAuthStateChanged } from 'firebase/auth';
 import badgeImage from '../../../assets/images/badge.png'; 
+import { useTheme } from '../../../context/ThemeContext';
 
 
 const categoryStyles = {
@@ -30,7 +31,15 @@ const Courses = () => {
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState('All categories');
 
+    const { theme } = useTheme();
+
     // --- Effect to get the current user's authentication state ---
+    const containerBg = theme === 'dark' ? 'bg-[#171717]' : 'bg-white';
+    const textColor = theme === 'dark' ? 'text-white' : 'text-black';
+    const cardColor = theme === 'dark' ? 'bg-[#262626]' : 'bg-gray-100';
+    const spinnerColor = theme === 'dark' ? 'border-white' : 'border-black';
+    const borderColor = theme === 'dark' ? 'border-black/50' : 'border-gray-200';
+
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
             setUser(currentUser);
@@ -93,30 +102,31 @@ const Courses = () => {
     }, [selectedCategory, allCourses]);
 
     if (loading) {
-        return <div className="flex justify-center items-center h-screen">
-                <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+        return <div className={`flex justify-center items-center h-screen ${containerBg}`}>
+                <div className={`w-12 h-12 border-4 ${spinnerColor} border-t-transparent rounded-full animate-spin`}></div>
             </div>;
     }
 
     if (error) {
         return <div className="p-8 max-w-7xl ml-[300px] text-red-600">{error}</div>;
     }
+    
 
     return (
-        <div className="p-2 sm:p-4 lg:ml-[300px] mb-[65px] lg:mb-0 mt-[65px] lg:mt-0">
+        <div className={`p-2 sm:p-4 lg:ml-[300px] mb-[65px] lg:mb-0 mt-[65px] lg:mt-0 ${containerBg}`}>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2 sm:gap-0">
-                <h2 className="text-2xl sm:text-3xl font-bold">Courses</h2>
-                <button onClick={() => setSelectedCategory('All categories')} className="text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-400 rounded-full hover:bg-gray-100 whitespace-nowrap">Clear filters</button>
+                <h2 className={`text-2xl sm:text-3xl font-bold ${textColor}`}>Courses</h2>
+                <button onClick={() => setSelectedCategory('All categories')} className={`text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-400 rounded-full hover:bg-gray-100 whitespace-nowrap ${textColor}`}>Clear filters</button>
             </div>
 
-            <div className="mb-4 sm:mb-6">
+            <div className={`mb-4 sm:mb-6 ${containerBg}`}>
                 <select 
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full sm:w-auto border rounded-lg px-3 sm:px-4 py-2 text-sm"
+                    className={`w-full sm:w-auto border rounded-lg px-3 sm:px-4 py-2 text-sm ${textColor}`}
                 >
                     <option value="All categories">All categories</option>
-                    {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                    {categories.map(cat => <option className={`${containerBg}`} key={cat} value={cat}>{cat}</option>)}
                 </select>
             </div>
 
@@ -130,11 +140,11 @@ const Courses = () => {
                         <Link
                             to={isEnrolled ? `/student/courses/${course.id}` : `/student/course/${course.id}`}
                             key={course.id}
-                            className="bg-gray-100 border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition duration-200 cursor-pointer"
+                            className={`${cardColor} border ${borderColor} rounded-xl overflow-hidden hover:shadow-md transition duration-200 cursor-pointer`}
                         >
                             <div className="relative bg-black text-white p-4 sm:p-6 lg:p-9">
                                 <div className='w-full'>
-                                    <h3 className="text-base sm:text-lg font-semibold mb-2 break-words pr-12 sm:pr-16">{course.courseTitle}</h3>
+                                    <h3 className={`text-base sm:text-lg font-semibold mb-2 break-words pr-12 sm:pr-16 ${textColor}`}>{course.courseTitle}</h3>
                                 </div>
                                 <div className="w-full sm:w-[70%] lg:w-[60%]">
                                     <p className="text-xs sm:text-sm mb-3 sm:mb-4 h-8 sm:h-10 truncate">{course.shortDescription}</p>
@@ -163,13 +173,13 @@ const Courses = () => {
                             </div>
 
                             <div className="p-3 sm:p-4">
-                                <h4 className="font-semibold text-sm mb-1">{course.courseTitle}</h4>
+                                <h4 className={`font-semibold text-sm mb-1 ${textColor}`}>{course.courseTitle}</h4>
                                 <div className="flex items-center gap-2 text-xs text-gray-600 mb-1">
                                     <span className="bg-gray-200 px-2 py-0.5 rounded-full flex gap-1">
                                         <GraduationCap size={12} className="sm:w-[14px] sm:h-[14px]" />Certificate
                                     </span>
                                 </div>
-                                <p className="text-xs text-gray-500">{course.courseCategory}</p>
+                                <p className={`text-xs text-gray-500 ${textColor}`}>{course.courseCategory}</p>
                             </div>
                         </Link>
                     );

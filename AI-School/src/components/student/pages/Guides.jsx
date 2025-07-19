@@ -3,7 +3,7 @@ import { ChevronDown, Bookmark } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../../lib/firebaseConfig';
-// import badgeImage from "../../assets/images/badge.png"; 
+import { useTheme } from '../../../context/ThemeContext'; 
 
 const Guides = () => {
     // --- State for data and filters ---
@@ -12,6 +12,8 @@ const Guides = () => {
     const [error, setError] = useState(null);
     const [categoryFilter, setCategoryFilter] = useState('All categories');
     const [skillFilter, setSkillFilter] = useState('All skill levels');
+
+    const { theme } = useTheme(); 
 
     // --- Fetch guides from Firestore ---
     useEffect(() => {
@@ -61,9 +63,15 @@ const Guides = () => {
         setSkillFilter('All skill levels');
     };
 
+    const containerBg = theme === 'dark' ? 'bg-[#171717]' : 'bg-white';
+    const textColor = theme === 'dark' ? 'text-white' : 'text-black';
+    const errorTextColor = theme === 'dark' ? 'text-red-400' : 'text-red-500';
+    const spinnerColor = theme === 'dark' ? 'border-white' : 'border-black';
+    const cardBg = theme === 'dark' ? 'bg-[#262626]' : 'bg-gray-50' 
+
     if (loading) {
-        return <div className="flex justify-center items-center h-screen">
-                <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
+        return <div className={`flex justify-center items-center h-screen ${containerBg}`}>
+                <div className={`w-12 h-12 border-4 ${spinnerColor} border-t-transparent rounded-full animate-spin`}></div>
             </div>;
     }
 
@@ -86,15 +94,15 @@ const Guides = () => {
 };
 
     return (
-        <div className="max-w-7xl mx-auto p-3 sm:p-4 md:p-6 bg-white lg:ml-[300px] mt-[60px] lg:mt-0 mb-[60px] lg:mb-0 overflow-auto overflow-x-hidden">
-    <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8">Guides</h1>
+        <div className={`p-3 sm:p-4 md:p-6 ${containerBg} lg:ml-[300px] mt-[60px] lg:mt-0 mb-[60px] lg:mb-0 overflow-auto overflow-x-hidden`}>
+    <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4 sm:mb-6 md:mb-8 ${textColor}`}>Guides</h1>
     
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4 mb-4 sm:mb-6 md:mb-8">
         <div className="relative flex-1 sm:flex-none">
             <select 
                 value={categoryFilter}
                 onChange={(e) => setCategoryFilter(e.target.value)}
-                className="w-full appearance-none bg-gray-100 border border-gray-300 rounded-lg px-3 sm:px-4 py-2 pr-8 text-sm sm:text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full appearance-none bg-gray-100 border border-gray-300 rounded-lg px-3 sm:px-4 py-2 pr-8 text-sm sm:text-base text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500`}
             >
                 {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
             </select>
@@ -125,7 +133,7 @@ const Guides = () => {
             <Link 
                 to={`/student/guides/${guide.id}`} 
                 key={guide.id} 
-                className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                className={`${cardBg} rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow`}
             >
                 <div className={`h-40 sm:h-44 md:h-48 relative p-3 sm:p-4 bg-gray-800`}>
                     <img 
@@ -142,7 +150,7 @@ const Guides = () => {
                 </div>
                 
                 <div className="p-4 sm:p-5 md:p-6">
-                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 leading-tight h-12 sm:h-14 overflow-hidden">
+                    <h3 className={`text-base sm:text-lg font-semibold ${textColor} mb-2 leading-tight h-12 sm:h-14 overflow-hidden`}>
                         {guide.courseTitle}
                     </h3>
                     <div className="mb-3 sm:mb-4">
@@ -150,7 +158,7 @@ const Guides = () => {
                             {guide.courseLevel}
                         </span>
                     </div>
-                    <div className="text-xs sm:text-sm text-gray-600 h-8 sm:h-10 overflow-hidden">
+                    <div className={`text-xs sm:text-sm ${textColor} h-8 sm:h-10 overflow-hidden`}>
                         {guide.tags && guide.tags.join(' | ')}
                     </div>
                 </div>

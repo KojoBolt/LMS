@@ -20,7 +20,7 @@ import StudentDashboard from './components/student/Dashboard';
 import CourseList from './components/student/CourseList';
 import CourseDetails from './components/student/CourseDetails';
 import EnrolledCourses from './components/student/EnrolledCourses';
-import VideoPlayer from './components/student/VideoPlayer';
+// import VideoPlayer from './components/student/VideoPlayer';
 import Loading from './components/student/Loading';
 import Guides from './components/student/pages/Guides';
 import Courses from './components/student/pages/Courses';
@@ -34,6 +34,7 @@ import Profile from './components/student/Profile';
 import Progress from './components/student/Progress';
 import GuideDetails from './components/student/GuideDetails';
 import WorkshopDetails from './components/student/pages/WorkshopDetails';
+import Skuler from './components/student/pages/Skuler';
 
 // Admin Components
 import AdminDashboard from './components/admin/AdminDashboard';
@@ -88,7 +89,7 @@ const App = () => {
             <Route path="courses" element={<Courses />} />
             <Route path="courses/:courseId" element={<CourseDetails />} />
             <Route path="enrolled-courses" element={<EnrolledCourses />} />
-            <Route path="video/:courseId/:videoId" element={<VideoPlayer />} />
+            {/* <Route path="video/:courseId/:videoId" element={<VideoPlayer />} /> */}
             <Route path="workshops" element={<Workshops />} />
             <Route path="events" element={<Events />} />
             <Route path="course/:courseId" element={<CourseDescriptionPage />} />
@@ -98,6 +99,7 @@ const App = () => {
             <Route path="profile" element={<Profile />} />
             <Route path="progress" element={<Progress />} />
             <Route path="workshops/:workshopId" element={<WorkshopDetails />} />
+            <Route path="skuler" element={<Skuler />} />
           </Route>
         </Route>
 

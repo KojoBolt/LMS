@@ -2,15 +2,14 @@ import React, { useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import badgeImage from "../../assets/images/badge.png"; 
+import { useTheme } from '../../context/ThemeContext';
 
 const MainContent = ({ enrolledCourses }) => {
     const scrollRef = useRef(null);
     const [currentPage, setCurrentPage] = useState(0);
     const coursesPerPage = 3;
+    const { theme } = useTheme();
 
-    // --- THIS IS THE FIX ---
-    // Filter the incoming list to only include items with the contentType of 'course'.
-    // This also handles older data that might not have the contentType field yet.
     const coursesToDisplay = enrolledCourses.filter(course => 
         !course.contentType || course.contentType === 'course'
     );
@@ -28,6 +27,12 @@ const MainContent = ({ enrolledCourses }) => {
         return coursesToDisplay.slice(startIndex, startIndex + coursesPerPage);
     };
     
+    const textColor = theme === 'dark' ? 'text-black' : 'text-black';
+    const cardBg = theme === 'dark' ? 'bg-[#262626]' : 'bg-gray-100';
+    // const borderBg = theme === 'dark' ? 'border border-gray-50' : 'border border-gray-200'
+    const shadowBG = theme === 'dark' ? 'shadow-lg' : 'border border-gray-300'
+
+
     const badgeColor = "bg-blue-200"; 
 
     // If there are no courses to display after filtering, render nothing.
@@ -42,17 +47,17 @@ const MainContent = ({ enrolledCourses }) => {
                 <div className="flex gap-2">
                     <button
                         onClick={() => scroll("left")}
-                        className="p-2 bg-gray-200 rounded-full hover:bg-gray-300 disabled:opacity-50"
+                        className= {`p-2 bg-gray-200 rounded-full hover:bg-gray-300 disabled:opacity-50`}
                         disabled={currentPage === 0}
                     >
-                        <ChevronLeft size={20} />
+                        <ChevronLeft size={20} className={`${textColor}`}/>
                     </button>
                     <button
                         onClick={() => scroll("right")}
                         className="p-2 bg-gray-200 rounded-full hover:bg-gray-300 disabled:opacity-50"
                         disabled={(currentPage + 1) * coursesPerPage >= coursesToDisplay.length}
                     >
-                        <ChevronRight size={20} />
+                        <ChevronRight size={20} className={`${textColor}`} />
                     </button>
                 </div>
             </div>
@@ -65,7 +70,7 @@ const MainContent = ({ enrolledCourses }) => {
                     <Link
                         to={`/student/courses/${course.id}`}
                         key={course.id}
-                        className="bg-white rounded-xl block hover:scale-[1.01] transition-transform border border-gray-200"
+                        className={`bg-white rounded-xl block hover:scale-[1.01] transition-transform ${shadowBG}`}
                     >
                         <div className="bg-black text-white p-4 rounded-t-xl relative min-h-[200px]">
                             <h3 className="text-lg font-semibold mb-2">{course.courseTitle}</h3>
@@ -89,7 +94,7 @@ const MainContent = ({ enrolledCourses }) => {
                                 </div>
                             </div>
                         </div>
-                        <div className="bg-gray-50 p-4 rounded-b-xl">
+                        <div className={`p-4 rounded-b-xl ${cardBg}`}>
                             <div className="text-sm text-black mb-1 bg-[#E3E3E3] p-1 w-[100px] rounded-2xl text-center">
                                 Course
                             </div>
