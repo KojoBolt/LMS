@@ -1,19 +1,26 @@
+// functions/index.js
+
+// --- Imports for all functions ---
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
-import { getAuth } from "firebase-admin/auth"; // Added for admin functions
+import { getAuth } from "firebase-admin/auth";
 import { defineString } from "firebase-functions/params";
 import axios from "axios";
 
--
+// --- Initialize Firebase Services Once at the top ---
 initializeApp();
 const db = getFirestore();
-const adminAuth = getAuth(); // Use a different name to avoid confusion
+const adminAuth = getAuth();
 
 // --- Define Secrets Once ---
 const paystackSecretKey = defineString("PAYSTACK_SECRET");
 
 
+// ========================================================================
+// --- 1. Your Existing, Working Paystack Verification Function ---
+// ========================================================================
+// THIS FUNCTION HAS NOT BEEN CHANGED.
 export const verifyPaystackPayment = onCall(async (request) => {
   if (!request.auth) {
     console.error("Authentication failed: User not logged in.");
@@ -94,18 +101,26 @@ export const verifyPaystackPayment = onCall(async (request) => {
     throw new HttpsError("internal", "An unexpected error occurred during verification.");
   }
 });
+
+
 // ========================================================================
-// --- 2. Your New Function to Create an Admin User ---
+// --- 2. UPDATED Function to Create Users with Roles ---
 // ========================================================================
-export const createAdminUser = onCall(async (request) => {
+// This replaces the old 'createAdminUser' function with a more flexible one.
+export const createUserWithRole = onCall(async (request) => {
     if (request.auth?.token.role !== 'admin') {
-        throw new HttpsError('permission-denied', 'Only admins can create other admins.');
+        throw new HttpsError('permission-denied', 'Only admins can create new users.');
     }
 
-    const { email, password, name, profilePicUrl } = request.data;
+    const { email, password, name, profilePicUrl, role } = request.data;
 
-    if (!email || !password || !name) {
-        throw new HttpsError('invalid-argument', 'Missing required fields: email, password, and name.');
+    if (!email || !password || !name || !role) {
+        throw new HttpsError('invalid-argument', 'Missing required fields: email, password, name, and role.');
+    }
+    
+    const allowedRoles = ['admin', 'instructor'];
+    if (!allowedRoles.includes(role)) {
+        throw new HttpsError('invalid-argument', 'Invalid role specified.');
     }
 
     try {
@@ -116,21 +131,23 @@ export const createAdminUser = onCall(async (request) => {
             photoURL: profilePicUrl || null,
         });
 
-        await adminAuth.setCustomUserClaims(userRecord.uid, { role: 'admin' });
+        await adminAuth.setCustomUserClaims(userRecord.uid, { role: role });
 
         await db.collection('users').doc(userRecord.uid).set({
             uid: userRecord.uid,
             name: name,
             email: email,
-            role: 'admin',
+            role: role,
             profilePicUrl: profilePicUrl || '',
             createdAt: new Date().toISOString(),
             enrolledCourses: []
         });
 
+        console.log(`Successfully created new ${role}:`, userRecord.uid);
         return { success: true, uid: userRecord.uid };
+
     } catch (error) {
-        console.error('Error creating new admin user:', error);
+        console.error(`Error creating new ${role}:`, error);
         throw new HttpsError('internal', error.message);
     }
 });
@@ -139,6 +156,7 @@ export const createAdminUser = onCall(async (request) => {
 // ========================================================================
 // --- 3. Temporary Function to Create the First Admin ---
 // ========================================================================
+// THIS FUNCTION HAS NOT BEEN CHANGED.
 export const setInitialAdmin = onCall(async (request) => {
   if (request.auth?.token.email !== 'kojobolt@gmail.com') {
     throw new HttpsError('permission-denied', 'You are not authorized to perform this action.');
@@ -158,6 +176,10 @@ export const setInitialAdmin = onCall(async (request) => {
   }
 });
 
+// ========================================================================
+// --- 4. Function to Delete an Admin User ---
+// ========================================================================
+// THIS FUNCTION HAS NOT BEEN CHANGED.
 export const deleteAdminUser = onCall(async (request) => {
     if (request.auth?.token.role !== 'admin') {
         throw new HttpsError('permission-denied', 'Only admins can delete users.');

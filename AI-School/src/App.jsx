@@ -48,10 +48,17 @@ import WorkshopForm from './components/admin/WorkshopForm';
 import AdminProfile from './components/admin/AdminProfile';
 import AdminManagement from './components/admin/AdminManagement';
 
+//Instructor Dashboard 
+import InstructorDashboard from './components/instructor/InstructorDashboard'
+import UploadCourses from './components/instructor/UploadCourses'
+import InstructorProfile from './components/instructor/InstructorProfile'
+import InstructorEditCourse from './components/instructor/InstructorEditCourse'
+
 // Layout Components
 import AdminLayout from './components/layouts/AdminLayout';
 import StudentLayout from './components/layouts/StudentLayout';
 import PublicLayout from './components/layouts/PublicLayout';
+import InstructorLayout from './components/layouts/InstructorLayout'
 
 const App = () => {
   return (
@@ -121,6 +128,19 @@ const App = () => {
             <Route path="users" element={<AdminManagement />} />
           </Route>
         </Route>
+
+        <Route element={<ProtectedRoute allowedRoles={['instructor']} />}>
+          <Route path="/instructor" element={<InstructorLayout />}>
+            <Route index element={<InstructorDashboard />} />
+            <Route path="dashboard" element={<InstructorDashboard />} />
+            <Route path="courses" element={<UploadCourses />} />
+            <Route path="profile" element={<InstructorProfile />} />
+            <Route path="edit-course/:courseId" element={<InstructorEditCourse />} />
+            
+            
+
+          </Route>
+          </Route>
 
         {/* Optional loading route */}
         <Route path="/loading" element={<Loading />} />

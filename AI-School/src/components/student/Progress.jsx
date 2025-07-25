@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
-import { auth, db } from '../../lib/firebaseConfig'; // Adjust path if needed
+import { auth, db } from '../../lib/firebaseConfig'; 
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, doc, getDoc, query, where, getDocs } from 'firebase/firestore';
 import badgeImage from "../../assets/images/badge.png"; 
+import { useTheme } from '../../context/ThemeContext';
 
 const categoryColors = {
     'web-development': 'bg-green-200',
@@ -20,6 +21,11 @@ const Progress = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [user, setUser] = useState(null);
+    const { theme } = useTheme();
+
+    const containerBg = theme === 'dark' ? 'bg-[#171717]' : 'bg-white';
+    const textColor = theme === 'dark' ? 'text-white' : 'text-gray-700';
+    const cardBg = theme === 'dark' ? 'bg-[#262626]' : 'bg-gray-50' 
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -85,9 +91,9 @@ const Progress = () => {
     }
 
     return (
-        <div className=" lg:ml-[300px] mt-[30px] w-full max-w-7xl px-4 overflow-x-hidden">
+        <div className={`p-3 sm:p-4 md:p-6 ${containerBg} lg:ml-[300px] mt-[60px] lg:mt-0 mb-[60px] lg:mb-0 overflow-auto overflow-x-hidden`}>
             <div className="flex items-center justify-between mb-4">
-                <div className="flex flex-col items-start">
+                <div className={`flex flex-col items-start ${textColor}`}>
                     <h2 className="font-semibold flex text-4xl p-3">My Learning</h2>
                     <p className="text-gray-600 text-sm p-3">
                         Track your courses progress
@@ -100,15 +106,14 @@ const Progress = () => {
                     {enrolledCourses.map((item) => {
                         const badgeColor = categoryColors[item.courseCategory] || categoryColors.default;
 
-                        // --- THIS IS THE NEW LOGIC ---
-                        // Check the contentType to decide which card to render
+                        
                         if (item.contentType === 'guide' || item.contentType === 'workshop') {
-                            // Render the simpler thumbnail-focused card for Guides and Workshops
+                            
                             return (
                                 <Link
-                                    to={`/student/${item.contentType}s/${item.id}`} // Dynamic link
+                                    to={`/student/${item.contentType}s/${item.id}`} 
                                     key={item.id}
-                                    className="bg-gray-50 rounded-xl block hover:scale-[1.01] transition-transform border border-gray-200 overflow-hidden"
+                                    className={`${cardBg} rounded-xl block hover:scale-[1.01] transition-transform border border-gray-200 overflow-hidden ${textColor}`}
                                 >
                                     <div className="relative h-48 bg-black">
                                         <img 
@@ -132,7 +137,7 @@ const Progress = () => {
                                 <Link
                                     to={`/student/courses/${item.id}`}
                                     key={item.id}
-                                    className="bg-white rounded-xl block hover:scale-[1.01] transition-transform border border-gray-200"
+                                    className={`${cardBg} rounded-xl block hover:scale-[1.01] transition-transform border border-gray-200`}
                                 >
                                     <div className="bg-black text-white p-4 rounded-t-xl relative min-h-[200px]">
                                         <div className='w-[70%]'>
@@ -155,8 +160,8 @@ const Progress = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="bg-gray-50 p-4 rounded-b-xl">
-                                        <div className="text-sm text-black mb-1 bg-[#E3E3E3] p-1 w-[100px] rounded-2xl text-center">
+                                    <div className={`${cardBg} p-4 rounded-b-xl ${textColor}`}>
+                                        <div className="text-sm text-black mb-1 bg-[#E3E3E3] p-1 w-[100px] rounded-2xl text-center ">
                                             Course
                                         </div>
                                         <div className="text-sm font-medium">{item.courseTitle}</div>

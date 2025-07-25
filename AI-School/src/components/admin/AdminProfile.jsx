@@ -19,17 +19,18 @@ const AdminProfile = () => {
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    // --- State for adding a new admin ---
-    const [newAdminName, setNewAdminName] = useState('');
-    const [newAdminEmail, setNewAdminEmail] = useState('');
-    const [newAdminPassword, setNewAdminPassword] = useState('');
-    const [newAdminPictureFile, setNewAdminPictureFile] = useState(null);
+    // --- NEW: State for Adding a New User (Admin or Instructor) ---
+    const [newUserName, setNewUserName] = useState('');
+    const [newUserEmail, setNewUserEmail] = useState('');
+    const [newUserPassword, setNewUserPassword] = useState('');
+    const [newUserRole, setNewUserRole] = useState('instructor'); // Default to instructor
+    const [newUserPictureFile, setNewUserPictureFile] = useState(null);
 
     // --- State for UI feedback ---
     const [loading, setLoading] = useState(true);
     const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
-    const [isCreatingAdmin, setIsCreatingAdmin] = useState(false);
+    const [isCreatingUser, setIsCreatingUser] = useState(false);
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState('');
 
@@ -47,8 +48,6 @@ const AdminProfile = () => {
                     setEmail(currentUser.email);
                     setProfilePicturePreview(userData.profilePicUrl || 'https://placehold.co/80x80/1F2A37/9CA3AF?text=Admin');
                 }
-            } else {
-                // Handle not logged in
             }
             setLoading(false);
         });
@@ -81,7 +80,7 @@ const AdminProfile = () => {
             setProfilePicturePreview(URL.createObjectURL(file));
         }
     };
-
+    
     const handleProfileUpdate = async () => {
         if (!user) return setError("You must be logged in.");
         setIsUpdatingProfile(true);
@@ -93,18 +92,10 @@ const AdminProfile = () => {
                 newProfilePicUrl = await handleFileUpload(profilePictureFile);
                 if (!newProfilePicUrl) { setIsUpdatingProfile(false); return; }
             }
-            const updatedData = {
-                firstName,
-                lastName,
-                name: `${firstName} ${lastName}`,
-                profilePicUrl: newProfilePicUrl,
-            };
+            const updatedData = { firstName, lastName, name: `${firstName} ${lastName}`, profilePicUrl: newProfilePicUrl };
             const userDocRef = doc(db, 'users', user.uid);
             await updateDoc(userDocRef, updatedData);
-            await updateProfile(auth.currentUser, {
-                displayName: `${firstName} ${lastName}`,
-                photoURL: newProfilePicUrl,
-            });
+            await updateProfile(auth.currentUser, { displayName: `${firstName} ${lastName}`, photoURL: newProfilePicUrl });
             setSuccessMessage("Profile updated successfully!");
         } catch (err) {
             setError(err.message);
@@ -112,8 +103,7 @@ const AdminProfile = () => {
             setIsUpdatingProfile(false);
         }
     };
-
-    // --- Password Update Logic ---
+    
     const handlePasswordUpdate = async () => {
         if (!user || !currentPassword || !newPassword) return setError("Please fill all password fields.");
         if (newPassword !== confirmPassword) return setError("New passwords do not match.");
@@ -135,78 +125,67 @@ const AdminProfile = () => {
         }
     };
 
-    // --- Add New Admin Logic ---
-    const handleNewAdminPictureChange = (e) => {
+    // --- NEW: Logic to handle creating a new user ---
+    const handleNewUserPictureChange = (e) => {
         const file = e.target.files[0];
-        if (file) setNewAdminPictureFile(file);
+        if (file) setNewUserPictureFile(file);
     };
 
-    const handleCreateAdmin = async (e) => {
+    const handleCreateUser = async (e) => {
         e.preventDefault();
-        if (!newAdminName || !newAdminEmail || !newAdminPassword) {
-            return setError("Please fill in all fields for the new admin.");
+        if (!newUserName || !newUserEmail || !newUserPassword) {
+            return setError("Please fill in all fields for the new user.");
         }
-        setIsCreatingAdmin(true);
+        setIsCreatingUser(true);
         setError(null);
         setSuccessMessage('');
+
         try {
             let profilePicUrl = '';
-            if (newAdminPictureFile) {
-                profilePicUrl = await handleFileUpload(newAdminPictureFile);
-                if (!profilePicUrl) { setIsCreatingAdmin(false); return; }
+            if (newUserPictureFile) {
+                profilePicUrl = await handleFileUpload(newUserPictureFile);
+                if (!profilePicUrl) { setIsCreatingUser(false); return; }
             }
+
             const functions = getFunctions();
-            const createAdmin = httpsCallable(functions, 'createAdminUser');
-            const result = await createAdmin({
-                email: newAdminEmail,
-                password: newAdminPassword,
-                name: newAdminName,
+            const createUser = httpsCallable(functions, 'createUserWithRole');
+            const result = await createUser({
+                email: newUserEmail,
+                password: newUserPassword,
+                name: newUserName,
                 profilePicUrl: profilePicUrl,
+                role: newUserRole, // Pass the selected role
             });
+
             if (result.data.success) {
-                setSuccessMessage(`New admin created successfully with UID: ${result.data.uid}`);
-                setNewAdminName('');
-                setNewAdminEmail('');
-                setNewAdminPassword('');
-                setNewAdminPictureFile(null);
+                setSuccessMessage(`New ${newUserRole} created successfully!`);
+                setNewUserName('');
+                setNewUserEmail('');
+                setNewUserPassword('');
+                setNewUserPictureFile(null);
             } else {
-                throw new Error(result.data.error || "Failed to create admin.");
+                throw new Error(result.data.error || "Failed to create user.");
             }
         } catch (err) {
+            console.error("Error creating user:", err);
             setError(err.message);
         } finally {
-            setIsCreatingAdmin(false);
+            setIsCreatingUser(false);
         }
     };
 
     if (loading) {
-        return <div className="flex justify-center items-center h-screen">
-                <div className="w-12 h-12 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
-            </div>;
+        return <div className="p-8 ml-[300px]">Loading profile...</div>;
     }
-//     const makeMeAdmin = async () => {
-//     if (!window.confirm("Are you sure you want to set yourself as the initial admin? This should only be done once.")) {
-//         return;
-//     }
-//     try {
-//         const functions = getFunctions();
-//         const setAdminRole = httpsCallable(functions, 'setInitialAdmin');
-//         const result = await setAdminRole();
-//         alert('Success! ' + result.data.message);
-//     } catch (err) {
-//         console.error(err);
-//         alert('Error: ' + err.message);
-//     }
-// };
 
     return (
-        <div className="lg:max-w-6xl lg:mx-auto p-8 bg-white lg:ml-[300px] w-[100%] overflow-x-hidden mt-[60px] lg:mt-0 mb-[60px] lg:mb-0">
+        <div className="lg:max-w-6xl lg:mx-auto p-8 bg-white lg:ml-[300px] w-[100%] overflow-x-hidden">
             <h1 className="text-3xl font-bold text-gray-900 mb-5 mt-[30px]">Profile</h1>
 
             {error && <div className="my-4 p-3 text-sm text-red-700 bg-red-100 rounded-md">{error}</div>}
             {successMessage && <div className="my-4 p-3 text-sm text-green-700 bg-green-100 rounded-md">{successMessage}</div>}
 
-            {/* --- Profile Details Section --- */}
+            {/* --- Profile Details Section (Unchanged) --- */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-1">
                     <h2 className="text-xl font-semibold text-gray-900">Profile details</h2>
@@ -245,8 +224,8 @@ const AdminProfile = () => {
 
             <hr className="my-10 border-gray-300" />
 
-            {/* --- Password Update Section --- */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* --- Password Update Section (Unchanged) --- */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-[65px] lg:mb-0">
                 <div className="md:col-span-1">
                     <h2 className="text-xl font-semibold text-gray-900">Update password</h2>
                     <p className="mt-1 text-sm text-gray-600">Ensure your account is using a long, random password.</p>
@@ -274,37 +253,41 @@ const AdminProfile = () => {
                 </div>
             </div>
 
-            {/* --- Add New Admin Section --- */}
+            {/* --- NEW: Add New User Section --- */}
             <hr className="my-10 border-gray-300" />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-1">
-                    <h2 className="text-xl font-semibold text-gray-900">Add New Admin</h2>
-                    <p className="mt-1 text-sm text-gray-600">Create a new user account with administrator privileges.</p>
+                    <h2 className="text-xl font-semibold text-gray-900">Add New User</h2>
+                    <p className="mt-1 text-sm text-gray-600">Create a new user account with a specific role.</p>
                 </div>
                 <div className="md:col-span-2">
-                    <form onSubmit={handleCreateAdmin} className="space-y-6">
+                    <form onSubmit={handleCreateUser} className="space-y-6">
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                            <input type="text" value={newAdminName} onChange={(e) => setNewAdminName(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
+                            <input type="text" value={newUserName} onChange={(e) => setNewUserName(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
-                            <input type="email" value={newAdminEmail} onChange={(e) => setNewAdminEmail(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
+                            <input type="email" value={newUserEmail} onChange={(e) => setNewUserEmail(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-                            <input type="password" value={newAdminPassword} onChange={(e) => setNewAdminPassword(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
+                            <input type="password" value={newUserPassword} onChange={(e) => setNewUserPassword(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md" />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                            <select value={newUserRole} onChange={(e) => setNewUserRole(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                <option value="instructor">Instructor</option>
+                                <option value="admin">Admin</option>
+                            </select>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Profile Picture</label>
-                            <input type="file" onChange={handleNewAdminPictureChange} accept="image/*" className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                            <input type="file" onChange={handleNewUserPictureChange} accept="image/*" className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
                         </div>
                         <div className="text-right">
-                            {/* <button onClick={makeMeAdmin} className="bg-yellow-500 text-white p-4 rounded-lg mb-4">
-            Make Me Initial Admin (Click Once)
-        </button> */}
-                            <button type="submit" disabled={isCreatingAdmin} className="bg-blue-600 text-white px-6 py-3 rounded font-medium hover:bg-blue-700 disabled:bg-gray-400">
-                                {isCreatingAdmin ? 'Creating Admin...' : 'Create Admin'}
+                            <button type="submit" disabled={isCreatingUser} className="bg-blue-600 text-white px-6 py-3 rounded font-medium hover:bg-blue-700 disabled:bg-gray-400">
+                                {isCreatingUser ? 'Creating User...' : 'Create User'}
                             </button>
                         </div>
                     </form>

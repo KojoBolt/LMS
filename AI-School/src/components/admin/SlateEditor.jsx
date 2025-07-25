@@ -135,7 +135,7 @@ const Image = ({ attributes, children, element }) => {
 
 const Leaf = ({ attributes, children, leaf }) => {
     if (leaf.bold) children = <strong>{children}</strong>;
-    if (leaf.code) children = <code className="bg-gray-100 p-1 rounded">{children}</code>;
+    if (leaf.code) children = <code className="bg-green-600 p-1 rounded">{children}</code>;
     if (leaf.italic) children = <em>{children}</em>;
     if (leaf.underline) children = <u>{children}</u>;
     return <span {...attributes}>{children}</span>;

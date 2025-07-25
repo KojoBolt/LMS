@@ -57,11 +57,14 @@ const Login = () => {
                 localStorage.setItem('userData', JSON.stringify(userData));
 
                 const role = userData.role;
-                if (role === "admin") {
-                    navigate("/admin/dashboard");
-                } else {
-                    navigate("/student/dashboard");
-                }
+                    if (role === "admin") {
+                        navigate("/admin/dashboard");
+                    } else if (role === "instructor") {
+                        navigate("/instructor/dashboard");
+                    } else {
+                        navigate("/student/dashboard");
+                    }
+
             } else {
                 setError("User data not found. Please contact support.");
             }
@@ -105,9 +108,14 @@ const Login = () => {
 
             localStorage.setItem('userData', JSON.stringify(userData));
 
-            if (userData.role === "admin") {
+            if (role === "admin") {
                 navigate("/admin/dashboard");
+            } else if (role === "instructor") {
+                // --- THIS IS THE NEW LOGIC ---
+                // If the role is 'instructor', send them to the new instructor dashboard
+                navigate("/instructor/dashboard");
             } else {
+                // Otherwise, they must be a student
                 navigate("/student/dashboard");
             }
 
@@ -186,7 +194,7 @@ const Login = () => {
                                 className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
                                 style={{ top: '24px' }}
                             >
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} className="mb-[20px]"/>}
+                                {showPassword ? <EyeOff size={20} className="mb-[20px]"/> : <Eye size={20} className="mb-[20px]"/>}
                             </button>
                             <p className="text-xs text-gray-500 mt-1">
                                 Enter, your correct email address and password

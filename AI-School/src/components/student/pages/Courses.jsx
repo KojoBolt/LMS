@@ -39,6 +39,7 @@ const Courses = () => {
     const cardColor = theme === 'dark' ? 'bg-[#262626]' : 'bg-gray-100';
     const spinnerColor = theme === 'dark' ? 'border-white' : 'border-black';
     const borderColor = theme === 'dark' ? 'border-black/50' : 'border-gray-200';
+    const titleColor = theme === 'dark' ? 'text-white' : 'text-white'
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -144,7 +145,7 @@ const Courses = () => {
                         >
                             <div className="relative bg-black text-white p-4 sm:p-6 lg:p-9">
                                 <div className='w-full'>
-                                    <h3 className={`text-base sm:text-lg font-semibold mb-2 break-words pr-12 sm:pr-16 ${textColor}`}>{course.courseTitle}</h3>
+                                    <h3 className={`text-base sm:text-lg font-semibold mb-2 break-words pr-12 sm:pr-16 ${titleColor}`}>{course.courseTitle}</h3>
                                 </div>
                                 <div className="w-full sm:w-[70%] lg:w-[60%]">
                                     <p className="text-xs sm:text-sm mb-3 sm:mb-4 h-8 sm:h-10 truncate">{course.shortDescription}</p>
