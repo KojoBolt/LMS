@@ -6,8 +6,9 @@ import {
 } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../lib/firebaseConfig"; 
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from 'lucide-react';
+import ForgotPassword from '../../components/auth/ForgotPassword';
 
 const Login = () => {
     const [email, setEmail] = useState("");
@@ -80,54 +81,62 @@ const Login = () => {
         }
     };
 
-    const handleGoogleLogin = async () => {
-        setError(null);
-        setIsLoading(true);
-        const provider = new GoogleAuthProvider();
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
+const handleGoogleLogin = async () => {
+  setError(null);
+  setIsLoading(true);
+  const provider = new GoogleAuthProvider();
 
-            const userDocRef = doc(db, "users", user.uid);
-            const userDocSnap = await getDoc(userDocRef);
-            let userData;
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
 
-            if (userDocSnap.exists()) {
-                userData = userDocSnap.data();
-            } else {
-                userData = {
-                    uid: user.uid,
-                    name: user.displayName,
-                    email: user.email,
-                    profilePicUrl: user.photoURL,
-                    role: 'student',
-                    createdAt: new Date(),
-                };
-                await setDoc(userDocRef, userData);
-            }
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
+    let userData;
 
-            localStorage.setItem('userData', JSON.stringify(userData));
+    if (userDocSnap.exists()) {
+      userData = userDocSnap.data();
+    } else {
+      userData = {
+        uid: user.uid,
+        name: user.displayName || "",
+        email: user.email || "",
+        profilePicUrl: user.photoURL || "",
+        role: "student",
+        createdAt: serverTimestamp(),
+      };
+      // Use merge to avoid accidentally wiping other fields
+      await setDoc(userDocRef, userData, { merge: true });
+    }
 
-            if (role === "admin") {
-                navigate("/admin/dashboard");
-            } else if (role === "instructor") {
-                // --- THIS IS THE NEW LOGIC ---
-                // If the role is 'instructor', send them to the new instructor dashboard
-                navigate("/instructor/dashboard");
-            } else {
-                // Otherwise, they must be a student
-                navigate("/student/dashboard");
-            }
+    localStorage.setItem('userData', JSON.stringify(userData));
 
-        } catch (error) {
-            console.error("Google login error:", error.code);
-            if (error.code !== 'auth/popup-closed-by-user') {
-                setError("Failed to sign in with Google. Please try again.");
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    // <-- DEFINE role here from userData
+    const role = userData?.role || "student";
+
+    if (role === "admin") {
+      navigate("/admin/dashboard");
+    } else if (role === "instructor") {
+      navigate("/instructor/dashboard");
+    } else {
+      navigate("/student/dashboard");
+    }
+  } catch (err) {
+    // log full error for debugging
+    console.error("Google login error:", err);
+
+    // handle common firebase popup case separately
+    if (err?.code === 'auth/popup-closed-by-user') {
+      // user closed popup — don't spam them with an error message
+      setError(null);
+    } else {
+      setError("Failed to sign in with Google. " + (err?.message || ""));
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#f0f4f8]">
@@ -211,6 +220,9 @@ const Login = () => {
                                     className="mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" 
                                 />
                                 <label htmlFor="remember-me" className="text-sm text-gray-600">Remember me</label>
+                            </div>
+                            <div className="flex text-[#155DFC]">
+                                <Link to='/forgot-password'>Forgot Password</Link>
                             </div>
                         </div>
                         <div className="flex items-start">

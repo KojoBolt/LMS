@@ -24,7 +24,7 @@ function NavBar() {
       </div>
 
       {/* Navigation Menu */}
-      <ul className="gap-x-6 text-sm font-medium bg-[#49658C]/50 px-4 py-3 rounded-xl hidden md:flex">
+      <ul className="gap-x-6 text-sm bg-[#49658C]/50 px-4 py-3 rounded-xl hidden md:flex font-bold lg:text-[15px]">
         <li className={getLinkClass("/")}>
           <Link to="/">Home</Link>
         </li>
@@ -34,9 +34,9 @@ function NavBar() {
         <li className={getLinkClass("/mission")}>
           <Link to="/mission">Our Mission</Link>
         </li>
-        <li className={getLinkClass("/career")}>
+        {/* <li className={getLinkClass("/career")}>
           <Link to="/career">Career</Link>
-        </li>
+        </li> */}
         <li className={getLinkClass("/login")}>
           <Link to="/login">Student Login</Link>
         </li>
@@ -63,9 +63,9 @@ function NavBar() {
           <li className={getLinkClass("/mission")} onClick={() => setIsMenuOpen(false)}>
             <Link to="/mission">Our Mission</Link>
           </li>
-          <li className={getLinkClass("/career")} onClick={() => setIsMenuOpen(false)}>
+          {/* <li className={getLinkClass("/career")} onClick={() => setIsMenuOpen(false)}>
             <Link to="/career">Career</Link>
-          </li>
+          </li> */}
           <li className={getLinkClass("/login")} onClick={() => setIsMenuOpen(false)}>
             <Link to="/login">Student Login</Link>
           </li>

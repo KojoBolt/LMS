@@ -9,6 +9,8 @@ import Home from './components/Home';
 import Programs from './components/Programs';
 import Career from './components/Career';
 import OurMission from './components/OurMission';
+import ProgramDetails from './components/ProgramDetails';   
+import Launchpad from './components/landingpages/Launchpad'; 
 
 // Auth Components
 import Login from './components/auth/Login';
@@ -72,6 +74,10 @@ const App = () => {
           <Route path="programs" element={<Programs />} />
           <Route path="career" element={<Career />} />
           <Route path="mission" element={<OurMission />} />
+          <Route path="/programs/:id" element={<ProgramDetails />} />
+          <Route path="/launchpad" element={<Launchpad />} />
+
+
         </Route>
 
         {/* ======================================== */}

@@ -13,12 +13,12 @@ const HeroCard = () => {
 ></div>
       {/* Left Content */}
       <div className="w-1/2 text-white space-y-6 pl-8">
-        <h1 className="lg:text-5xl text-2xl font-bold leading-tight">
+        <h1 className="lg:text-5xl font-bold leading-tight">
           READY TO <br />
           START DIGITAL <br />
           LAUNCHPAD?
         </h1>
-        <button className="bg-white text-black lg:px-6 lg:py-3 px-3 py-2 rounded-full font-semibold shadow-md hover:bg-gray-200 transition">
+        <button className="bg-white text-black lg:px-6 lg:py-6 px-3 py-2 rounded-full font-semibold shadow-md hover:bg-gray-200 transition text-[10px] lg:text-[15px]">
           GET STARTED TODAY
         </button>
       </div>

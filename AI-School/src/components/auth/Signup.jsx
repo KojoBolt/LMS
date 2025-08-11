@@ -8,6 +8,7 @@ import {
     GoogleAuthProvider
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
+import { serverTimestamp } from "firebase/firestore";
 
 const Signup = () => {
     const [name, setName] = useState("");
@@ -15,7 +16,7 @@ const Signup = () => {
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
-    const [agreedToTerms, setAgreedToTerms] = useState(false); // --- NEW: State for the checkbox ---
+    const [agreedToTerms, setAgreedToTerms] = useState(false); 
     const navigate = useNavigate();
 
     const handleEmailSignup = async (e) => {
@@ -63,41 +64,58 @@ const Signup = () => {
             setIsLoading(false);
         }
     };
+    
 
-    const handleGoogleSignup = async () => {
-        setError(null);
-        setIsLoading(true);
-        const provider = new GoogleAuthProvider();
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
+const handleGoogleSignup = async () => {
+  setError(null);
+  setIsLoading(true);
+  const provider = new GoogleAuthProvider();
 
-            const userDocRef = doc(db, "users", user.uid);
-            const userDocSnap = await getDoc(userDocRef);
+  try {
+    const result = await signInWithPopup(auth, provider);
+    const user = result.user;
 
-            if (!userDocSnap.exists()) {
-                await setDoc(userDocRef, {
-                    uid: user.uid,
-                    name: user.displayName,
-                    email: user.email,
-                    profilePicUrl: user.photoURL,
-                    role: 'student',
-                    createdAt: new Date().toISOString(),
-                    enrolledCourses: [],
-                });
-            }
-            
-            navigate("/student/dashboard");
+    const userDocRef = doc(db, "users", user.uid);
+    const userDocSnap = await getDoc(userDocRef);
 
-        } catch (error) {
-            console.error("Google signup error:", error.code);
-            if (error.code !== 'auth/popup-closed-by-user') {
-                setError("Failed to sign up with Google. Please try again.");
-            }
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    let userData;
+
+    if (userDocSnap.exists()) {
+      userData = userDocSnap.data();
+    } else {
+      const role = user.email === "kojobolt@gmail.com" ? "admin" : "student";
+      userData = {
+        uid: user.uid,
+        name: user.displayName || "",
+        email: user.email || "",
+        profilePicUrl: user.photoURL || "",
+        role,
+        createdAt: serverTimestamp(),
+        enrolledCourses: [],
+      };
+      await setDoc(userDocRef, userData);
+    }
+
+    // Store in localStorage if needed for session persistence
+    localStorage.setItem("userData", JSON.stringify(userData));
+
+    // Navigate based on role
+    if (userData.role === "admin") {
+      navigate("/admin/dashboard");
+    } else if (userData.role === "instructor") {
+      navigate("/instructor/dashboard");
+    } else {
+      navigate("/student/dashboard");
+    }
+  } catch (err) {
+    console.error("Google signup error:", err); // full error, not just err.code
+    if (err?.code !== "auth/popup-closed-by-user") {
+      setError("Failed to sign up with Google. " + (err?.message || ""));
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-[#f0f4f8]">
