@@ -17,7 +17,7 @@ const Login = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [agreedToTerms, setAgreedToTerms] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [rememberMe, setRememberMe] = useState(false); // --- NEW: State for "Remember Me" ---
+    const [rememberMe, setRememberMe] = useState(false); 
     const navigate = useNavigate();
 
     // --- NEW: Effect to check for a remembered email on component load ---

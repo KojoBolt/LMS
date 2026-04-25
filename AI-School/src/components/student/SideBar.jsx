@@ -103,16 +103,16 @@ const SideBar = ({ onSearchChange }) => {
     
 
     const activeLinkStyle = `flex items-center gap-3 text-[15px] font-semibold ${activeBg} ${textPrimary} p-2 rounded-lg`;
-    const inactiveLinkStyle = `flex items-center gap-3 text-[15px] ${textSecondary} hover:text-black p-2`;
+    const inactiveLinkStyle = `flex items-center gap-3 text-[15px] ${textSecondary} hover:text-${textPrimary} p-2`;
 
     return (
-        <div className={`${sidebarBg} fixed border-b-0 border-t-0 h-screen w-[300px] p-4 lg:flex flex-col justify-between top-0 left-0 z-50 overflow-x-hidden sm:hidden md:hidden hidden border border-r-gray-300`}>
+        <div className={`${sidebarBg} fixed border-b-0 border-t-0 min-h-screen w-[300px] p-4 lg:flex flex-col justify-between top-0 left-0 z-50 overflow-x-hidden sm:hidden md:hidden hidden border border-r-gray-300 lg:h-auto`}>
             <div>
                 <div className="mb-8 text-center">
                     {theme === 'dark' ? (
-                        <img src={SideLogoDark} alt="logo" className='w-24 h-12 m-auto' />
+                        <img src={SideLogoDark} alt="logo" className='w-18 h-12 m-auto' />
                     ) : (
-                        <img src={SideLogo} alt="logo" className='w-24 h-12 m-auto' />
+                        <img src={SideLogo} alt="logo" className='w-18 h-12 m-auto' />
                     )}
             </div>
                 <div>

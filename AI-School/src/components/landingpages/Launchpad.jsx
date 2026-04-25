@@ -9,10 +9,11 @@ import PricingSection from './PricingSection';
 import FAQ from './FAQ';
 import PayNow from './PayNow';
 import Footer from './Footer';
+import hero from '../../assets/images/hero.png';
 
 const Launchpad = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#561B06] via-[#000] to-[#561B06]">
+    <div className="min-h-screen bg-gradient-to-br from-[#561B06] via-[#000] to-[#561B06] overflow-x-hidden">
       {/* Background pattern overlay */}
       <div className="absolute inset-0 opacity-10">
 
@@ -67,122 +68,9 @@ const Launchpad = () => {
           </div>
 
           {/* Right Content - Dashboard Preview */}
-          <div className="relative">
-            {/* Main Dashboard Window */}
-            <div className="bg-gray-800 rounded-xl p-1 shadow-2xl">
-              {/* Dashboard Header */}
-              <div className="bg-gray-700 rounded-t-lg p-4 flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="text-white font-bold text-sm">
-                    DIGITAL<br/>LAUNCHPAD
-                  </div>
-                </div>
-                <div className="text-white text-sm">Dashboard</div>
-              </div>
 
-              {/* Dashboard Content */}
-              <div className="bg-gray-900 rounded-b-lg p-6 space-y-6">
-                {/* Profile Section */}
-                <div className="flex items-center space-x-4 bg-gray-800 rounded-lg p-4">
-                  <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
-                    <img src="https://media.istockphoto.com/id/1338134319/photo/portrait-of-young-indian-businesswoman-or-school-teacher-pose-indoors.jpg?s=612x612&w=0&k=20&c=Dw1nKFtnU_Bfm2I3OPQxBmSKe9NtSzux6bHqa9lVZ7A=" alt="Profile" className="w-8 h-8 rounded-full" />
-                  </div>
-                  <div>
-                    <div className="text-white font-semibold">Femi Peters</div>
-                    <div className="text-gray-400 text-sm">Student</div>
-                  </div>
-                </div>
+          <img src={hero} alt="hero" className='w-full h-auto rounded-lg shadow-lg' />
 
-                {/* Navigation Menu */}
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-3 text-white p-2 bg-[#C72713] rounded-lg">
-                    <div className="w-5 h-5 bg-white rounded-sm"></div>
-                    <span className="text-sm">Dashboard</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-gray-400 p-2 hover:bg-gray-800 rounded-lg">
-                    <div className="w-5 h-5 bg-gray-600 rounded-sm"></div>
-                    <span className="text-sm">Programs</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-gray-400 p-2 hover:bg-gray-800 rounded-lg">
-                    <div className="w-5 h-5 bg-gray-600 rounded-sm"></div>
-                    <span className="text-sm">Live Events</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-gray-400 p-2 hover:bg-gray-800 rounded-lg">
-                    <div className="w-5 h-5 bg-gray-600 rounded-sm"></div>
-                    <span className="text-sm">Resources</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-gray-400 p-2 hover:bg-gray-800 rounded-lg">
-                    <div className="w-5 h-5 bg-gray-600 rounded-sm"></div>
-                    <span className="text-sm">Community</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-gray-400 p-2 hover:bg-gray-800 rounded-lg">
-                    <div className="w-5 h-5 bg-gray-600 rounded-sm"></div>
-                    <span className="text-sm">Recordings</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-gray-400 p-2 hover:bg-gray-800 rounded-lg">
-                    <div className="w-5 h-5 bg-gray-600 rounded-sm"></div>
-                    <span className="text-sm">Support</span>
-                  </div>
-                  <div className="flex items-center space-x-3 text-gray-400 p-2 hover:bg-gray-800 rounded-lg">
-                    <div className="w-5 h-5 bg-gray-600 rounded-sm"></div>
-                    <span className="text-sm">Settings</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Main Content Window */}
-            <div className="absolute -right-8 top-8 w-96 bg-gray-800 rounded-xl shadow-2xl overflow-hidden">
-              {/* Hero Section */}
-              <div className="bg-gradient-to-r from-[#C72713] to-black p-6 text-center">
-                <div className="text-white font-bold text-lg mb-2">
-                  DIGITAL<br/>LAUNCHPAD
-                </div>
-                <button className="bg-white text-red-600 px-6 py-2 rounded-lg font-semibold text-sm">
-                  START WATCHING
-                </button>
-                <div className="flex justify-center space-x-2 mt-4">
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
-                  <div className="w-2 h-2 bg-white/50 rounded-full"></div>
-                  <div className="w-2 h-2 bg-white/50 rounded-full"></div>
-                  <div className="w-2 h-2 bg-white/50 rounded-full"></div>
-                  <div className="w-2 h-2 bg-white/50 rounded-full"></div>
-                </div>
-              </div>
-
-              {/* Content Cards */}
-              <div className="p-4 space-y-4">
-                <div className="text-white text-xs mb-2">Your progress</div>
-                
-                {/* Purple Card */}
-                <div className="bg-gradient-to-r from-purple-600 to-pink-500 rounded-lg p-4 relative">
-                  <div className="text-white text-sm font-semibold mb-1">Business Launch</div>
-                  <div className="text-white/80 text-xs mb-3">Crafting a Compelling Story Entry Points Checklist Blueprint</div>
-                  <div className="flex items-center justify-between">
-                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                      <div className="w-4 h-4 border-2 border-white rounded-full"></div>
-                    </div>
-                    <div className="text-white text-2xl font-bold">8</div>
-                  </div>
-                </div>
-
-                <div className="text-white text-xs">Connect with students</div>
-                
-                {/* Red Community Card */}
-                <div className="bg-gradient-to-r from-red-600 to-red-500 rounded-lg p-4 relative">
-                  <div className="text-white text-lg font-bold mb-2">JOIN THE<br/>COMMUNITY</div>
-                  <button className="bg-white text-red-600 px-4 py-2 rounded-lg font-semibold text-xs">
-                    GET STARTED
-                  </button>
-                  <div className="absolute top-4 right-4">
-                    <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                      <div className="w-6 h-6 bg-white rounded-sm"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
 

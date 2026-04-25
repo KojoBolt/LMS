@@ -1,5 +1,3 @@
-import React from 'react';
-import founder from '../assets/images/founders.jpg';
 import DigitalPack from '../assets/images/action.jpg'
 
 
@@ -30,21 +28,6 @@ const HeroCard = () => {
           alt="Pathway to Profits"
           className="rounded-xl shadow-lg max-w-7xl"
         />
-        {/* <img
-          src={founder}
-          alt="Digital Don"
-          className="rounded-xl shadow-lg"
-        />
-        <img
-          src={founder}
-          alt="Digital Launchpad"
-          className="rounded-xl shadow-lg"
-        />
-        <img
-          src={founder}
-          alt="Ad Architect"
-          className="rounded-xl shadow-lg"
-        /> */}
       </div>
     </div>
   );

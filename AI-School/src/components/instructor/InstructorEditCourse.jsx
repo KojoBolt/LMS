@@ -182,7 +182,7 @@ const InstructorEditCourse = () => {
         </div>
     );
 
-    // --- THIS IS THE CORRECTED RENDER FUNCTION ---
+    // ---RENDER FUNCTION ---
     const renderContent = () => (
         <div className="space-y-6">
             <div className="flex justify-between items-center">

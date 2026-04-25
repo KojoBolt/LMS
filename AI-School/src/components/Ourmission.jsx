@@ -96,7 +96,7 @@ const Ourmission = () => {
 
         <hr className="border-t border-gray-800 my-24" />
 
-        {/* Section 3: Philanthropy */}
+        {/* Section 3: Call to action foooter */}
         <HeroCard/>
 
       </div>

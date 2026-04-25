@@ -9,6 +9,8 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { serverTimestamp } from "firebase/firestore";
+import { Eye, EyeOff } from 'lucide-react';
+
 
 const Signup = () => {
     const [name, setName] = useState("");
@@ -17,6 +19,8 @@ const Signup = () => {
     const [error, setError] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [agreedToTerms, setAgreedToTerms] = useState(false); 
+    const [showPassword, setShowPassword] = useState(false);
+    
     const navigate = useNavigate();
 
     const handleEmailSignup = async (e) => {
@@ -177,15 +181,24 @@ const handleGoogleSignup = async () => {
                                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
-                        <div>
+                        <div className="relative">
                             <label className="block text-sm font-medium mb-1">Password *</label>
                             <input
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 placeholder="********"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
+                        <button 
+                            type="button" 
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500"
+                            style={{ top: '24px' }}
+                            >
+                            {showPassword ? <EyeOff size={20} className="mb-[20px]"/> : <Eye size={20} className="mb-[20px]"/>}
+                        </button>
+                            
                             <p className="text-xs text-gray-500 mt-1">
                                 Must contain 1 uppercase letter, 1 number, min 8 characters
                             </p>

@@ -37,7 +37,7 @@ const AccessDashboard = () => {
 
         {/* Right Section - Skills */}
         <div className="space-y-6">
-          <div className="bg-gradient-to-br from-[#9C3413] via-[#232121] to-[#232121] rounded-lg p-6 w-[400px]">
+          <div className="bg-gradient-to-br from-[#9C3413] via-[#232121] to-[#232121] rounded-lg p-6 w-full">
             <h2 className="text-2xl font-bold text-[#FB440A] mb-4">
               THE SKILLS THAT WORKS FOR YOU.
             </h2>
@@ -46,7 +46,7 @@ const AccessDashboard = () => {
             </p>
             
             {/* Skills Grid */}
-            <img src="https://www.skillshub.com/wp-content/uploads/2023/04/collage-illustration.jpg" alt="" className='w-full h-auto rounded-lg shadow-lg' />
+            <img src="https://www.skillshub.com/wp-content/uploads/2023/04/collage-illustration.jpg" alt="" className='w-full h-[250px] rounded-lg shadow-lg' />
           </div>
         </div>
       </div>
@@ -143,7 +143,7 @@ const AccessDashboard = () => {
   <div className="bg-[#232121] rounded-lg p-6 items-center md:items-start gap-6 md:gap-3 h-[350px] ">
     {/* Text */}
     <div className="flex justify-center md:justify-start ">
-      <img src={Desktop} alt="" className='w-[300px] h-[200px] m-auto' />
+      <img src={Desktop} alt="" className='lg:w-[280px] lg:h-[200px] w-[200px] h-[150px] m-auto' />
     </div>
     
     <div className="flex-1 text-center md:text-left">
